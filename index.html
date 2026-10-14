@@ -456,7 +456,7 @@
         </div>
 
         <div class="k" style="margin-top: 56px" data-r>ACROSS THE CAMPUS</div>
-        <h2 data-r>Where the <em>24 students</em> fall.</h2>
+        <h2 data-r>Where the <em id="scCampusN">296 students</em> fall.</h2>
         <div class="app-grid" style="margin-top: 28px">
           <div class="card" data-r>
             <div class="m">SUCCESS SCORE DISTRIBUTION</div>
@@ -548,7 +548,7 @@
           </div>
           <div class="card" data-r style="--d:1">
             <div class="m">4. AT-RISK IDENTIFICATION: RULES + PREDICTION</div>
-            <p style="margin-top:10px;font-size:15px;color:var(--mut)"><b style="color:#fff;font-weight:500">Rules (explainable, today).</b> Declining results (semester average falls 8+ points), low subject average (below 55 over 3+ records), repeated topic difficulty (two low scores on the same topic), missing assessments and low attendance as context. Two academic signals = Priority review; one = Support recommended; context only = Monitor.</p>
+            <p style="margin-top:10px;font-size:15px;color:var(--mut)"><b style="color:#fff;font-weight:500">Rules (explainable, today).</b> Declining results (semester average falls 8+ points and the subject ends below 70), low subject average (below 55 over 3+ records), repeated topic difficulty (two low scores on the same topic), missing assessments and low attendance as context. Two academic signals = Priority review; one = Support recommended; context only = Monitor.</p>
             <p style="margin-top:10px;font-size:15px;color:var(--mut)"><b style="color:#fff;font-weight:500">Prediction (early warning, next semester).</b> A transparent logistic model: logit = −0.35 + 0.075·(62 − academic) + 0.045·(75 − attendance) + 0.02·(60 − LMS) + 0.6·backlogs + 0.12·(−trajectory slope) + 0.25·missing assessments. Probability ≥ 60% = high, ≥ 35% = elevated. A trajectory falling 4+ points per semester raises an early warning on its own. Coefficients are hand-set for the demo; an institution fits them on its own outcome history.</p>
             <div id="mtRisk" style="margin-top:10px"></div>
           </div>
@@ -1071,6 +1071,26 @@
       </div>
       <div class="qa" data-qa="admin" aria-label="Administrator tools"></div>
       <div class="kpis" id="adKpis" style="margin-top: 16px"></div>
+      <div class="app-grid vz-grid" style="margin-top: 16px">
+        <div class="card">
+          <div class="m">RISK FLAGS BY SECTION <small>click a section to filter</small></div>
+          <svg class="chart vz" id="adRiskCls" viewBox="0 0 640 270" role="group" aria-label="Share of students in each support level, by section"></svg>
+          <div class="legend vz-l" id="adRiskClsL"></div>
+          <p class="fine" id="adRiskClsNote" style="margin-top: 8px"></p>
+        </div>
+        <div class="card">
+          <div class="m">SEMESTER CHANGE BY SECTION <small>Sem 3 to Sem 5</small></div>
+          <svg class="chart vz" id="adChange" viewBox="0 0 640 270" role="group" aria-label="Change in section average from Sem 3 to Sem 5"></svg>
+          <div class="legend vz-l"><span><i style="background: var(--ok)"></i>Improving</span><span><i style="background: var(--rk)"></i>Declining</span></div>
+          <p class="fine" id="adChangeNote" style="margin-top: 8px"></p>
+        </div>
+      </div>
+      <div class="card" style="margin-top: 16px">
+        <div class="m">ATTENDANCE VS AVERAGE SCORE <small>one dot per student</small></div>
+        <svg class="chart vz" id="adScatter" viewBox="0 0 640 300" role="img" aria-label="Scatter plot of attendance against average score, coloured by support level"></svg>
+        <div class="legend vz-l" id="adScatterL"></div>
+        <p class="fine" id="adScatterNote" style="margin-top: 8px"></p>
+      </div>
       <div class="card" style="margin-top: 16px" id="adPipeline">
         <div class="app-head" style="align-items: center">
           <div><div class="m">DATA INTEGRATION PIPELINE</div><p class="fine" style="margin-top: 6px">Seven source exports joined on <code>student_id</code>, cleaned, logged, then every score on this page is recomputed. Drop your own CSVs to replace the demo.</p></div>
@@ -1113,7 +1133,7 @@
           <p class="fine" style="margin-top: 12px">Demo support indicators from transparent rules (see the rules card). They are reviewable signals, not validated predictions.</p>
           <div class="m" style="margin-top: 20px">ACADEMIC AND ATTENDANCE TREND</div>
           <svg class="chart" id="adTrend" viewBox="0 0 640 220" role="img" aria-label="Average score and attendance by term"></svg>
-          <div class="legend"><span><i style="background: var(--cy)"></i>Average score</span><span><i style="background: rgba(138,168,255,.6)"></i>Attendance %</span></div>
+          <div class="legend"><span><i style="background: var(--cy)"></i>Average score</span><span><i style="background: rgba(138,168,255,.6)"></i>Attendance %</span><span><i style="background: rgba(255,255,255,.22)"></i>Each section (All view)</span></div>
         </div>
         <div class="card">
           <div class="m">CLASS COMPARISON</div>
