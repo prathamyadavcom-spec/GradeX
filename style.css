@@ -667,3 +667,23 @@ body.is-staff #navList li:not([id]):not(:first-child), body.has-role .nav-join {
 }
 
 :root{color-scheme:dark}
+
+/* admin visual analytics */
+.vz-l { flex-wrap: wrap; gap: 8px 16px; }
+.chart.vz .lbl { fill: var(--ink); font: 12px var(--font); }
+.chart.vz .val { fill: var(--ink); font: 12px var(--font); }
+.chart.vz .vz-row { cursor: pointer; outline: none; }
+.chart.vz .vz-row .hit { fill: transparent; }
+.chart.vz .vz-row:hover .hit, .chart.vz .vz-row:focus-visible .hit { fill: rgba(90, 209, 245, .07); }
+.chart.vz .vz-row.on .hit { fill: rgba(90, 209, 245, .12); }
+.chart.vz .vz-row.dim { opacity: .38; }
+.chart.vz .ref { stroke: rgba(255, 255, 255, .28); stroke-dasharray: 4 4; }
+.chart.vz .dot { opacity: .85; stroke: rgba(5, 8, 15, .7); stroke-width: .8; cursor: pointer; transition: r .15s; }
+.chart.vz .dot:hover { opacity: 1; stroke: #fff; }
+.chart .ln.sec { stroke: rgba(255, 255, 255, .16); stroke-width: 1.2; }
+.chart .pt.sec { r: 2; fill: rgba(255, 255, 255, .3); }
+@media (min-width: 900px) { .vz-grid { grid-template-columns: 1fr 1fr; } }
+
+/* keep the 3D scene as ambience behind dashboards so it never sits on top of data */
+body.is-dash #gl { opacity: .14 !important; }
+@media (max-width: 600px) { .chart.vz .lbl, .chart.vz .val { font-size: 20px; } .chart.vz .ax { font-size: 17px; } }
