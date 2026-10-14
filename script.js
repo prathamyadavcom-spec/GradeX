@@ -883,7 +883,7 @@
   function toast(msg, err) { var t = $('#toast'); t.textContent = msg; t.classList.toggle('err', !!err); t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, 2800); }
 
   /* ---------- 1. demo dataset ---------- */
-  var RULES = { low: 55, drop: 8, topicLow: 55, att: 75, minRecs: 3, spread: 30 };
+  var RULES = { low: 55, drop: 8, topicLow: 55, att: 75, minRecs: 3, spread: 30, declineFloor: 70 };
   var TOPICS = [['Logic', 'Graphs', 'Combinatorics'], ['Linked lists', 'Trees', 'Hashing'], ['SQL', 'Normalisation', 'Transactions'], ['Presentations', 'Report writing', 'Group discussion'], ['Scheduling', 'Memory', 'File systems'], ['TCP/IP', 'Routing', 'Security']];
   var TERMS = [{ n: 'Sem 3', from: '2025-01-01', to: '2025-06-30' }, { n: 'Sem 4', from: '2025-07-01', to: '2025-12-31' }, { n: 'Sem 5', from: '2026-01-01', to: '2026-06-30' }];
   var SLOTS = [[['Quiz', '2025-02-10'], ['Test', '2025-03-24'], ['Exam', '2025-05-19']], [['Quiz', '2025-08-11'], ['Test', '2025-09-29'], ['Exam', '2025-11-24']], [['Quiz', '2026-02-09'], ['Test', '2026-03-23'], ['Exam', '2026-05-18']]];
@@ -911,20 +911,22 @@
   function hash(str) { var h = 2166136261; for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   var STUDENTS = [], ASSESS = [], BYSID = {}, ASSESS_BY = {}, SOURCES = null, QUALITY = null, DATASET = { name: 'Fictional demo dataset', origin: 'generated in the page', students: 0 };
 
+  /* cohort-level change per semester (points), so sections differ and the campus trend tells a story: most sections improve, IT-B and BCA-A decline */
+  var CLASS_DRIFT = { 'CSE-C': 4, 'IT-A': 3.5, 'IT-B': -2.5, 'ECE-B': 3, 'BCA-A': -1.5, 'BCA-B': 4.5, 'MCA-A': 2.5 };
   /* ---------- 1a. demo generator: 10 sections, ~300 fictional students, story students kept in CSE-A / CSE-B / ECE-A ---------- */
   function genDemo() {
     var students = [], assess = [], by = {}, n = 0, used = {};
     var mk = function (name, c) {
       var id = 's' + (n + 1 < 100 ? ('0' + (n + 1)).slice(-2) : String(n + 1)); n++;
       var R = rng(hash(name + c.id)), st = { id: id, name: name, cls: c.id, roll: n, att: [], joined: '2025-01-01' };
-      var story = n <= 24, lvl0 = story ? .56 + R() * .34 : .47 + R() * .47, drift = (R() - .5) * 9, base = SUBJECTS.map(function () { return clamp(lvl0 * 100 + (R() - .5) * 22, 25, 97); }), trend = SUBJECTS.map(function () { return story ? (R() - .4) * 7 : drift + (R() - .5) * 6; });
-      SUBJECTS.forEach(function (s, i) { var t = 38 + Math.floor(R() * 10), rate = story ? .68 + R() * .3 : .55 + R() * .43; st.att.push([Math.min(t, Math.round(t * rate)), t]); });
+      var story = n <= 24, lvl0 = story ? .56 + R() * .34 : .48 + Math.sqrt(R()) * .43, drift = (CLASS_DRIFT[c.id] || 0) + (R() - .5) * 7, base = SUBJECTS.map(function () { return clamp(lvl0 * 100 + (R() - .5) * 22, 25, 97); }), trend = SUBJECTS.map(function () { return story ? (R() - .4) * 7 : drift + (R() - .5) * 6; });
+      SUBJECTS.forEach(function (s, i) { var t = 38 + Math.floor(R() * 10), rate = story ? .68 + R() * .3 : .6 + R() * .38; st.att.push([Math.min(t, Math.round(t * rate)), t]); });
       var lvl = mean(base) / 100;
       st.ext = {
         backlogs: R() < (lvl < .55 ? .5 : .12) ? 1 + Math.floor(R() * 2) : 0,
         lms: { logins: Math.round(1 + R() * 6 + lvl * 2), completion: clamp(Math.round(45 + lvl * 40 + (R() - .5) * 30), 20, 100) },
         eng: { events: Math.floor(R() * 6), clubs: Math.floor(R() * 3), hackathons: Math.floor(R() * 3), certs: Math.floor(R() * 4) },
-        plc: { apt: clamp(Math.round(22 + lvl * 60 + (R() - .5) * 30), 15, 98), code: clamp(Math.round(15 + lvl * 65 + (R() - .5) * 36), 10, 98), mock: clamp(Math.round(25 + lvl * 52 + (R() - .5) * 34), 15, 98) },
+        plc: { apt: clamp(Math.round(17 + lvl * 60 + (R() - .5) * 30), 15, 98), code: clamp(Math.round(10 + lvl * 65 + (R() - .5) * 36), 10, 98), mock: clamp(Math.round(20 + lvl * 52 + (R() - .5) * 34), 15, 98) },
         skills: { tech: clamp(Math.round(35 + lvl * 45 + (R() - .5) * 30), 20, 98), soft: clamp(Math.round(40 + R() * 50), 20, 98) },
         fb: { sat: Math.round((2.6 + R() * 2.2) * 10) / 10, fac: Math.round((2.8 + R() * 2) * 10) / 10 }
       };
@@ -1159,7 +1161,7 @@
 
   /* ---------- 3. learning-gap rules and support classification ---------- */
   var RULE_TEXT = [
-    ['Declining results', 'A subject\'s semester average falls by ' + RULES.drop + ' or more points from one semester to the next (each semester needs 2+ scored records). If a later semester recovers by 5+ points the decline is kept as context, not an active signal.'],
+    ['Declining results', 'A subject\'s semester average falls by ' + RULES.drop + ' or more points from one semester to the next (each semester needs 2+ scored records). If a later semester recovers by 5+ points, or the subject is still at ' + RULES.declineFloor + ' or above, the decline is kept as context, not an active signal.'],
     ['Low subject average', 'A subject\'s average over its scored assessments is below ' + RULES.low + ' with at least ' + RULES.minRecs + ' records.'],
     ['Repeated topic difficulty', 'Two or more scored quizzes/tests tagged with the same topic are below ' + RULES.topicLow + '. Exams are mixed-topic and never produce topic claims.'],
     ['Inconsistent across subjects', 'The gap between the highest and lowest subject average is ' + RULES.spread + ' points or more.'],
@@ -1178,8 +1180,8 @@
       var all = recs(sid, i), s = scored(all), tm = [0, 1, 2].map(function (t) { var x = scored(recs(sid, i, t)); return x.length >= 2 ? mean(x.map(function (a) { return a.score; })) : null; });
       for (var t = 0; t < 2; t++) {
         if (tm[t] === null || tm[t + 1] === null || tm[t] - tm[t + 1] < RULES.drop) continue;
-        var later = t + 2 < 3 && tm[t + 2] !== null ? tm[t + 2] : null, recovered = later !== null && later >= tm[t + 1] + 5, evd = scored(recs(sid, i, t)).concat(scored(recs(sid, i, t + 1)));
-        out.push({ type: 'decline', sev: recovered ? 'support' : 'priority', current: !recovered, subj: i, title: 'Declining results in ' + n + ', ' + TERMS[t].n + ' to ' + TERMS[t + 1].n, pattern: n + ' averaged ' + r1(tm[t]) + ' in ' + TERMS[t].n + ' and ' + r1(tm[t + 1]) + ' in ' + TERMS[t + 1].n + ', a drop of ' + r1(tm[t] - tm[t + 1]) + ' points.' + (later !== null ? (recovered ? ' Recovery observed later: ' + TERMS[t + 2].n + ' average ' + r1(later) + '.' : ' ' + TERMS[t + 2].n + ' average ' + r1(later) + ', no recovery yet.') : ''), ev: evd, period: TERMS[t].n + ' (' + fmtD(TERMS[t].from) + ') to ' + TERMS[t + 1].n + ' (' + fmtD(TERMS[t + 1].to) + ')', n: evd.length, limits: 'Subject-level marks only. A decline can have many explanations (difficulty of the paper, absence, workload); it is not evidence about effort or teaching quality.' + (recovered ? ' Counted as context, not an active signal, because a later semester recovered.' : '') });
+        var later = t + 2 < 3 && tm[t + 2] !== null ? tm[t + 2] : null, recovered = later !== null && later >= tm[t + 1] + 5, latest = later !== null ? later : tm[t + 1], still = latest >= RULES.declineFloor, evd = scored(recs(sid, i, t)).concat(scored(recs(sid, i, t + 1)));
+        out.push({ type: 'decline', sev: recovered || still ? 'support' : 'priority', current: !recovered && !still, subj: i, title: 'Declining results in ' + n + ', ' + TERMS[t].n + ' to ' + TERMS[t + 1].n, pattern: n + ' averaged ' + r1(tm[t]) + ' in ' + TERMS[t].n + ' and ' + r1(tm[t + 1]) + ' in ' + TERMS[t + 1].n + ', a drop of ' + r1(tm[t] - tm[t + 1]) + ' points.' + (later !== null ? (recovered ? ' Recovery observed later: ' + TERMS[t + 2].n + ' average ' + r1(later) + '.' : ' ' + TERMS[t + 2].n + ' average ' + r1(later) + ', no recovery yet.') : ''), ev: evd, period: TERMS[t].n + ' (' + fmtD(TERMS[t].from) + ') to ' + TERMS[t + 1].n + ' (' + fmtD(TERMS[t + 1].to) + ')', n: evd.length, limits: 'Subject-level marks only. A decline can have many explanations (difficulty of the paper, absence, workload); it is not evidence about effort or teaching quality.' + (recovered ? ' Counted as context, not an active signal, because a later semester recovered.' : (still ? ' Counted as context, not an active signal, because the subject is still at ' + RULES.declineFloor + ' or above.' : '')) });
       }
       if (s.length >= RULES.minRecs) {
         var av = mean(s.map(function (a) { return a.score; }));
@@ -1204,7 +1206,7 @@
     /* one academic signal per subject for low/topic (they describe the same weakness); a decline is a separate signal */
     var n = uniq(acad.filter(function (g) { return g.type !== 'decline'; }).map(function (g) { return g.subj; })).length + acad.filter(function (g) { return g.type === 'decline' && g.current; }).length;
     var level = 'on_track';
-    if (n >= 2 || (n === 1 && miss >= 2)) level = 'priority'; else if (n === 1) level = 'support'; else if (ctx.length || miss >= 2) level = 'monitor';
+    if (n >= 2 || (n === 1 && miss >= 2)) level = 'priority'; else if (n === 1) level = 'support'; else if (ctx.length || miss >= 2 || acad.some(function (g) { return g.type === 'decline'; })) level = 'monitor';
     return { level: level, gaps: gaps, reasons: gaps.map(function (g) { return g.title; }) };
   }
   var CLS_CACHE = {};
@@ -1277,10 +1279,10 @@
   /* ---------- charts ---------- */
   function lineChart(svg, series, opts) {
     /* series: [{pts:[{x,y,cls,label}], cls}], x in 0..1 */
-    opts = opts || {}; var W = 640, H = +svg.getAttribute('viewBox').split(' ')[3], padL = 30, padR = 12, top = 14, padB = 28, iw = W - padL - padR, ih = H - top - padB, out = '';
-    var y = function (v) { return top + ih - ih * v / 100; }, x = function (k) { return padL + iw * k; };
-    out += '<rect class="band" x="' + padL + '" y="' + y(RULES.low) + '" width="' + iw + '" height="' + (ih - (y(RULES.low) - top)) + '"/>';
-    [0, 25, 50, 75, 100].forEach(function (v) { out += '<line class="axis" x1="' + padL + '" y1="' + y(v) + '" x2="' + (W - padR) + '" y2="' + y(v) + '" stroke-width="1"/><text class="ax" x="0" y="' + (y(v) + 4) + '">' + v + '</text>'; });
+    opts = opts || {}; var W = 640, H = +svg.getAttribute('viewBox').split(' ')[3], padL = 30, padR = 12, top = 14, padB = 28, iw = W - padL - padR, ih = H - top - padB, out = '', y0 = opts.yMin || 0, y1 = opts.yMax || 100;
+    var y = function (v) { return top + ih - ih * (clamp(v, y0, y1) - y0) / (y1 - y0); }, x = function (k) { return padL + iw * k; };
+    if (RULES.low > y0) out += '<rect class="band" x="' + padL + '" y="' + y(RULES.low) + '" width="' + iw + '" height="' + (ih - (y(RULES.low) - top)) + '"/>';
+    (opts.ticks || [0, 25, 50, 75, 100]).forEach(function (v) { out += '<line class="axis" x1="' + padL + '" y1="' + y(v) + '" x2="' + (W - padR) + '" y2="' + y(v) + '" stroke-width="1"/><text class="ax" x="0" y="' + (y(v) + 4) + '">' + v + '</text>'; });
     (opts.xl || []).forEach(function (l) { out += '<text class="ax" x="' + x(l.x) + '" y="' + (H - 8) + '" text-anchor="' + (l.anchor || 'middle') + '">' + esc(l.t) + '</text>'; });
     (opts.vlines || []).forEach(function (v) { out += '<line class="ivl" x1="' + x(v.x) + '" y1="' + top + '" x2="' + x(v.x) + '" y2="' + (top + ih) + '"/><text class="ax" x="' + (x(v.x) + 4) + '" y="' + (top + 10) + '" fill="var(--ok)">' + esc(v.t) + '</text>'; });
     series.forEach(function (s) {
@@ -1305,9 +1307,12 @@
     if (note) note.textContent = (pts.length ? sc + ' scored assessment' + (sc === 1 ? '' : 's') + (ms ? ', ' + ms + ' without a recorded score' : '') + ', ' + fmtD(from) + ' to ' + fmtD(to) + '. ' : 'No scored assessments in this period. ') + (subj === -1 ? 'Each point is the average of the assessments held that day. ' : 'Shaded band marks scores below ' + RULES.low + '. ') + (vl.length ? 'Dashed line: recorded teaching adjustment.' : '');
     return pts.length;
   }
-  function termTrendChart(svg, clsId) {
-    var sc = [0, 1, 2].map(function (t) { return classAvg(clsId, t); }), at = classAtt(clsId), xs = [.12, .5, .88];
-    lineChart(svg, [{ pts: sc.map(function (v, i) { return { x: xs[i], y: v, label: TERMS[i].n + ' average ' + r1(v) }; }) }, { cls: 'b', pts: xs.map(function (x) { return { x: x, y: at, label: 'Attendance ' + r1(at) + '% (whole year)' }; }) }], { xl: TERMS.map(function (t, i) { return { x: xs[i], t: t.n + ' · ' + r1(sc[i]) }; }) });
+  function termTrendChart(svg, clsId, zoom) {
+    var sc = [0, 1, 2].map(function (t) { return classAvg(clsId, t); }), at = classAtt(clsId), xs = [.12, .5, .88], series = [];
+    if (zoom && !clsId) CLASSES.forEach(function (c) { var v = [0, 1, 2].map(function (t) { return classAvg(c.id, t); }); series.push({ cls: 'sec', pts: v.map(function (y, i) { return { x: xs[i], y: y, cls: 'sec', label: c.id + ', ' + TERMS[i].n + ': ' + r1(y) }; }) }); });
+    series.push({ pts: sc.map(function (v, i) { return { x: xs[i], y: v, label: (clsId || 'Campus') + ' ' + TERMS[i].n + ' average ' + r1(v) }; }) });
+    series.push({ cls: 'b', pts: xs.map(function (x) { return { x: x, y: at, label: 'Attendance ' + r1(at) + '% (whole year)' }; }) });
+    lineChart(svg, series, { xl: TERMS.map(function (t, i) { return { x: xs[i], t: t.n + ' · ' + r1(sc[i]) }; }), yMin: zoom ? 50 : 0, yMax: 100, ticks: zoom ? [50, 60, 70, 80, 90, 100] : null });
   }
 
   /* ---------- 3b. Student Success Score, placement readiness, risk flags, segmentation ---------- */
@@ -1677,7 +1682,65 @@
     more.hidden = rows.length <= AD.limit;
     $('#adCount').textContent = (rows.length > AD.limit ? 'First ' + AD.limit + ' of ' : '') + rows.length + ' of ' + classStudents(AD.cls).length + ' students shown' + (AD.seg ? ' in segment "' + segLabel(AD.seg) + '"' : '') + '. Average uses ' + (AD.term === -1 ? 'all scored assessments' : TERMS[AD.term].n) + '; attendance is the whole year. Click a column to sort.';
   }
+  /* ---------- admin visual analytics: risk by section, semester change, attendance vs score ---------- */
+  function svgEsc(v) { return esc(String(v)); }
+  function adminViz(ss, t, counts, col) {
+    var order = ['priority', 'support', 'monitor', 'on_track', 'insufficient'];
+    /* A. risk flags by section, stacked 100% bars, click to filter */
+    var rows = CLASSES.map(function (c) { var cs = classStudents(c.id), k = { priority: 0, support: 0, monitor: 0, on_track: 0, insufficient: 0 }; cs.forEach(function (s) { k[cls(s.id).level]++; }); return { c: c, n: cs.length, k: k, flagged: (k.priority + k.support) / (cs.length || 1) }; }).sort(function (a, b) { return b.flagged - a.flagged; });
+    var W = 640, rh = 26, padL = 84, padR = 62, top = 6, H = top + rows.length * rh + 4, bw = W - padL - padR, o = '';
+    rows.forEach(function (r, i) {
+      var y = top + i * rh, x = padL, sel = AD.cls === r.c.id, dim = AD.cls && !sel;
+      o += '<g class="vz-row' + (sel ? ' on' : '') + (dim ? ' dim' : '') + '" data-cls="' + r.c.id + '" tabindex="0" role="button" aria-label="' + svgEsc(r.c.id + ': ' + r.k.priority + ' priority, ' + r.k.support + ' support of ' + r.n + '. Filter to this section.') + '">';
+      o += '<rect class="hit" x="0" y="' + y + '" width="' + W + '" height="' + rh + '"/>';
+      o += '<text class="lbl" x="0" y="' + (y + 17) + '">' + r.c.id + '</text>';
+      order.forEach(function (lv) { var w = r.n ? r.k[lv] / r.n * bw : 0; if (w > 0) o += '<rect x="' + x.toFixed(1) + '" y="' + (y + 5) + '" width="' + Math.max(0, w - 1.5).toFixed(1) + '" height="' + (rh - 10) + '" rx="3" fill="' + col[lv] + '"><title>' + svgEsc(r.c.id + ' · ' + LEVEL[lv] + ': ' + r.k[lv] + ' of ' + r.n) + '</title></rect>'; x += w; });
+      o += '<text class="val" x="' + (W - padR + 8) + '" y="' + (y + 17) + '">' + Math.round(r.flagged * 100) + '%</text></g>';
+    });
+    var a = $('#adRiskCls'); a.setAttribute('viewBox', '0 0 ' + W + ' ' + H); a.innerHTML = o;
+    $('#adRiskClsL').innerHTML = order.slice(0, 4).map(function (lv) { return '<span><i style="background:' + col[lv] + '"></i>' + LEVEL[lv] + '</span>'; }).join('') + '<span><b style="color:#fff;font-weight:400">%</b> = priority + support</span>';
+    var top3 = rows.slice(0, 2).map(function (r) { return r.c.id + ' (' + Math.round(r.flagged * 100) + '%)'; }).join(' and ');
+    $('#adRiskClsNote').textContent = 'Sorted by share of students with an academic flag. Highest: ' + top3 + '. Click a section to filter the whole dashboard' + (AD.cls ? '; click it again to clear.' : '.');
+    /* B. semester change by section, Sem 3 to Sem 5, diverging bars */
+    var ch = CLASSES.map(function (c) { var a0 = classAvg(c.id, 0), a2 = classAvg(c.id, 2); return { c: c, a0: a0, a2: a2, d: a0 === null || a2 === null ? null : a2 - a0 }; }).filter(function (r) { return r.d !== null; }).sort(function (a, b) { return b.d - a.d; });
+    var mx = Math.max(4, Math.max.apply(null, ch.map(function (r) { return Math.abs(r.d); }))), cx = padL + (W - padL - padR) / 2, half = (W - padL - padR) / 2, H2 = top + ch.length * rh + 4; o = '';
+    o += '<line class="axis" x1="' + cx + '" y1="0" x2="' + cx + '" y2="' + H2 + '"/>';
+    ch.forEach(function (r, i) {
+      var y = top + i * rh, w = Math.abs(r.d) / mx * half, up = r.d >= 0, sel = AD.cls === r.c.id, dim = AD.cls && !sel;
+      o += '<g class="vz-row' + (sel ? ' on' : '') + (dim ? ' dim' : '') + '" data-cls="' + r.c.id + '" tabindex="0" role="button" aria-label="' + svgEsc(r.c.id + ' changed ' + (up ? '+' : '') + r1(r.d) + ' points from Sem 3 to Sem 5. Filter to this section.') + '"><rect class="hit" x="0" y="' + y + '" width="' + W + '" height="' + rh + '"/>';
+      o += '<text class="lbl" x="0" y="' + (y + 17) + '">' + r.c.id + '</text>';
+      o += '<rect x="' + (up ? cx : cx - w).toFixed(1) + '" y="' + (y + 5) + '" width="' + Math.max(1, w).toFixed(1) + '" height="' + (rh - 10) + '" rx="3" fill="' + (up ? 'var(--ok)' : 'var(--rk)') + '"><title>' + svgEsc(r.c.id + ': ' + r1(r.a0) + ' in Sem 3 → ' + r1(r.a2) + ' in Sem 5') + '</title></rect>';
+      o += '<text class="val" x="' + (up ? cx + w + 6 : cx - w - 6) + '" y="' + (y + 17) + '" text-anchor="' + (up ? 'start' : 'end') + '">' + (up ? '+' : '') + r1(r.d) + '</text></g>';
+    });
+    var b = $('#adChange'); b.setAttribute('viewBox', '0 0 ' + W + ' ' + H2); b.innerHTML = o;
+    var dn = ch.filter(function (r) { return r.d <= -2; }).map(function (r) { return r.c.id; });
+    $('#adChangeNote').textContent = 'Change in section average from Sem 3 to Sem 5. ' + (dn.length ? dn.join(' and ') + (dn.length > 1 ? ' are' : ' is') + ' declining: start with the Teaching Intelligence view for ' + (dn.length > 1 ? 'those sections.' : 'that section.') : 'No section is declining by 2 points or more.') + ' Observed change, not a causal claim.';
+    /* C. attendance vs average score, one dot per student, click to open the profile */
+    var pts = ss.map(function (s) { return { s: s, x: attOf(s.id).p, y: studentAvg(s.id, t), lv: cls(s.id).level }; }).filter(function (p) { return p.x !== null && p.y !== null; });
+    var W3 = 640, H3 = 300, pl = 34, pr = 12, pt = 12, pb = 30, iw = W3 - pl - pr, ih = H3 - pt - pb, xMin = 50, xMax = 100, yMin = 30, yMax = 100;
+    var X = function (v) { return pl + iw * (clamp(v, xMin, xMax) - xMin) / (xMax - xMin); }, Y = function (v) { return pt + ih - ih * (clamp(v, yMin, yMax) - yMin) / (yMax - yMin); };
+    o = '<rect class="band" x="' + pl + '" y="' + Y(RULES.low) + '" width="' + (X(RULES.att) - pl) + '" height="' + (pt + ih - Y(RULES.low)) + '"/>';
+    [30, 40, 50, 60, 70, 80, 90, 100].forEach(function (v) { o += '<line class="axis" x1="' + pl + '" y1="' + Y(v) + '" x2="' + (W3 - pr) + '" y2="' + Y(v) + '"/><text class="ax" x="0" y="' + (Y(v) + 4) + '">' + v + '</text>'; });
+    [50, 60, 70, 80, 90, 100].forEach(function (v) { o += '<text class="ax" x="' + X(v) + '" y="' + (H3 - 10) + '" text-anchor="' + (v === 50 ? 'start' : (v === 100 ? 'end' : 'middle')) + '">' + v + '%</text>'; });
+    o += '<line class="ref" x1="' + X(RULES.att) + '" y1="' + pt + '" x2="' + X(RULES.att) + '" y2="' + (pt + ih) + '"/><text class="ax" x="' + (X(RULES.att) + 4) + '" y="' + (pt + 10) + '">' + RULES.att + '% attendance</text>';
+    o += '<line class="ref" x1="' + pl + '" y1="' + Y(RULES.low) + '" x2="' + (W3 - pr) + '" y2="' + Y(RULES.low) + '"/><text class="ax" x="' + (W3 - pr) + '" y="' + (Y(RULES.low) - 4) + '" text-anchor="end">score ' + RULES.low + '</text>';
+    var drawOrder = ['on_track', 'monitor', 'insufficient', 'support', 'priority'];
+    pts.sort(function (p, q) { return drawOrder.indexOf(p.lv) - drawOrder.indexOf(q.lv); }).forEach(function (p) { o += '<a href="#profile-' + p.s.id + '"><circle class="dot" cx="' + X(p.x).toFixed(1) + '" cy="' + Y(p.y).toFixed(1) + '" r="' + (p.lv === 'priority' || p.lv === 'support' ? 4.2 : 3.2) + '" fill="' + col[p.lv] + '"><title>' + svgEsc(p.s.name + ' (' + p.s.cls + ') · average ' + r1(p.y) + ', attendance ' + r1(p.x) + '% · ' + LEVEL[p.lv]) + '</title></circle></a>'; });
+    var c3 = $('#adScatter'); c3.setAttribute('viewBox', '0 0 ' + W3 + ' ' + H3); c3.innerHTML = o;
+    var both = pts.filter(function (p) { return p.x < RULES.att && p.y < RULES.low + 10; }).length;
+    $('#adScatterNote').textContent = pts.length + ' students' + (AD.cls ? ' in ' + AD.cls : '') + (t === null ? '' : ', ' + TERMS[t].n + ' average') + '. ' + both + ' have attendance under ' + RULES.att + '% and an average under ' + (RULES.low + 10) + ': the first group to call in. Hover a dot for details, click to open the student profile.';
+    $('#adScatterL').innerHTML = order.map(function (lv) { return counts[lv] ? '<span><i style="background:' + col[lv] + ';border-radius:50%"></i>' + LEVEL[lv] + ' ' + counts[lv] + '</span>' : ''; }).join('');
+  }
+  function bindAdminViz() {
+    ['#adRiskCls', '#adChange'].forEach(function (id) {
+      var svg = $(id); if (!svg || svg.dataset.bound) return; svg.dataset.bound = '1';
+      var go = function (e) { var g = e.target.closest && e.target.closest('[data-cls]'); if (!g) return; AD.cls = AD.cls === g.dataset.cls ? '' : g.dataset.cls; AD.limit = 40; renderAdmin(); };
+      svg.addEventListener('click', go);
+      svg.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(e); } });
+    });
+  }
   function renderAdmin() {
+    bindAdminViz();
     $$('#adClass .chip').forEach(function (c, k) { c.setAttribute('aria-pressed', (k === 0 ? '' : c.textContent) === AD.cls ? 'true' : 'false'); });
     $$('#adTerm .chip').forEach(function (c, k) { c.setAttribute('aria-pressed', (k - 1) === AD.term ? 'true' : 'false'); });
     var ss = classStudents(AD.cls), t = AD.term === -1 ? null : AD.term, counts = { priority: 0, support: 0, monitor: 0, on_track: 0, insufficient: 0 };
@@ -1689,7 +1752,7 @@
     var col = { priority: 'var(--rk)', support: '#ff9a6b', monitor: 'var(--wa)', on_track: 'var(--ok)', insufficient: 'rgba(255,255,255,.25)' };
     $('#adDist').innerHTML = Object.keys(counts).map(function (k) { return '<i style="width:' + (ss.length ? counts[k] / ss.length * 100 : 0) + '%;background:' + col[k] + '"></i>'; }).join('');
     $('#adDistL').innerHTML = Object.keys(counts).map(function (k) { return '<span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:' + col[k] + ';margin-right:6px;vertical-align:-1px"></i>' + LEVEL[k] + ' <b>' + counts[k] + '</b></span>'; }).join('');
-    termTrendChart($('#adTrend'), AD.cls);
+    termTrendChart($('#adTrend'), AD.cls, true); adminViz(ss, t, counts, col);
     var bands = [['0-49', 0, 49], ['50-64', 50, 64], ['65-79', 65, 79], ['80-100', 80, 100]], bcol = ['var(--rk)', '#ff9a6b', 'var(--wa)', 'var(--ok)'];
     var bn = bands.map(function (b) { return ssv.filter(function (v) { return v >= b[1] && v < b[2] + 1; }).length; });
     $('#adSsDist').innerHTML = bn.map(function (n, i) { return '<i style="width:' + (ssv.length ? n / ssv.length * 100 : 0) + '%;background:' + bcol[i] + '"></i>'; }).join('');
@@ -1780,6 +1843,7 @@
       $('#scNew').innerHTML = NEW_FEATURES.map(function (f, i) { return '<a class="card ex" href="#' + f[3] + '"' + (f[3] === 'login' || f[3] === 'method' ? '' : (['admin', 'ti', 'profile-s04'].indexOf(f[3]) >= 0 ? ' data-role="' + (f[3] === 'ti' ? 'teacher' : 'admin') + '" data-go="' + f[3] + '"' : '')) + '><span class="ex-n">' + f[0] + '</span><b>' + f[1] + '</b><span class="ex-b">' + f[2] + '</span><span class="ex-go">Open &rarr;</span></a>'; }).join('');
       $$('[data-go]', $('#scNew')).forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); var r = a.getAttribute('data-role'); setRole(r); location.hash = a.dataset.go; }); });
       /* campus-wide, computed once */
+      if ($('#scCampusN')) $('#scCampusN').textContent = STUDENTS.length + ' students';
       var all = STUDENTS, ssv = all.map(function (s) { return successScore(s.id).score; }).filter(function (v) { return v !== null; });
       var bands = [['0-49', 0, 49], ['50-64', 50, 64], ['65-79', 65, 79], ['80-100', 80, 100]], bcol = ['var(--rk)', '#ff9a6b', 'var(--wa)', 'var(--ok)'];
       var bn = bands.map(function (b) { return ssv.filter(function (v) { return v >= b[1] && v < b[2] + 1; }).length; });
@@ -1861,14 +1925,14 @@
   var ASK_SUGGEST = {
     none: ['What should I study first?', 'Can I skip a DBMS class?', 'What is my next class?', 'What is my CGPA?', 'Which subject improved the most?', 'What if I gain 10 in DBMS?', 'What pages are there?'],
     student: ['What feedback have I received?', 'What is my success score?', 'How has my performance changed?', 'Which subjects may need more practice?', 'What is my recorded attendance?', 'What should I revise?', 'Help me plan my study time', 'Where am I heading next semester?', 'What is my CGPA?'],
-    teacher: ['What feedback has the class given?', 'What drives Ananya\'s success score?', 'Who is at risk of poor placement outcomes?', 'Which students have attendance below 75%?', 'Which students show a decline in recent assessments?', 'What is the attendance average for this class?', 'Which students may benefit from a check-in?', 'What evidence contributed to Diya\'s support status?', 'Which concepts may need revision across the class?', 'What teaching adjustment could help Diya in Discrete Maths?', 'Which interventions are awaiting follow-up?', 'Did the latest follow-up show a change?', 'What is Arjun\'s predicted risk?'],
-    admin: ['What is the average success score across campus?', 'Who is at risk of poor placement outcomes?', 'Which segments do students fall into?', 'What are the academic trends across CSE-A?', 'How does attendance vary across courses?', 'How many interventions require follow-up?', 'Which classes have incomplete assessment data?', 'How many students may need support?', 'Who is predicted to be high risk next semester?', 'What did the data cleaning fix?']
+    teacher: ['Which section has the lowest attendance?', 'What feedback has the class given?', 'What drives Ananya\'s success score?', 'Who is at risk of poor placement outcomes?', 'Which students have attendance below 75%?', 'Which students show a decline in recent assessments?', 'What is the attendance average for this class?', 'Which students may benefit from a check-in?', 'What evidence contributed to Diya\'s support status?', 'Which concepts may need revision across the class?', 'What teaching adjustment could help Diya in Discrete Maths?', 'Which interventions are awaiting follow-up?', 'Did the latest follow-up show a change?', 'What is Arjun\'s predicted risk?'],
+    admin: ['Which section has the most at-risk students?', 'Which section improved the most?', 'What is the average success score across campus?', 'Who is at risk of poor placement outcomes?', 'Which segments do students fall into?', 'What are the academic trends across CSE-A?', 'How does attendance vary across courses?', 'How many interventions require follow-up?', 'Which classes have incomplete assessment data?', 'How many students may need support?', 'Who is predicted to be high risk next semester?', 'What did the data cleaning fix?']
   };
-  function studentIn(q, pool) { var best = null; pool.forEach(function (s) { var p = s.name.toLowerCase().split(' '); if (q.indexOf(s.name.toLowerCase()) >= 0 || q.indexOf(p[0]) >= 0) best = s; }); return best; }
+  function studentIn(q, pool) { var best = null, full = false; pool.forEach(function (s) { var nm = s.name.toLowerCase(), p = nm.split(' '), w = function (t) { return new RegExp('(^|[^a-z])' + t.replace(/[^a-z]/g, '') + '(\'s)?([^a-z]|$)').test(q); }; if (q.indexOf(nm) >= 0) { best = s; full = true; } else if (!full && w(p[0])) best = s; }); return best; }
   function clsIn(q) { var hit = null; CLASSES.forEach(function (c) { if (q.indexOf(c.id.toLowerCase()) >= 0) hit = c.id; }); return hit; }
   function listNames(arr) { return arr.map(function (s) { return s.name; }).join(', '); }
   function askData(q) {
-    var role = ROLE.role, L = q.toLowerCase().replace(/\s+/g, ' '), si = subjIn(L), scope = role === 'admin' ? (clsIn(L) || '') : (ROLE.cls || 'CSE-A'), pool = classStudents(scope), who = studentIn(L, STUDENTS);
+    var role = ROLE.role, L = q.toLowerCase().replace(/\s+/g, ' ').replace(/at-risk/g, 'at risk'), si = subjIn(L), scope = role === 'admin' ? (clsIn(L) || '') : (ROLE.cls || 'CSE-A'), pool = classStudents(scope), who = studentIn(L, STUDENTS);
     var period = 'Period: all recorded semesters, Jan 2025 to Jun 2026. ', demo = ' (Fictional demo data.)';
     if (role === 'student') {
       var sid = ROLE.sid, C = cls(sid), A = attOf(sid);
@@ -1886,12 +1950,13 @@
     if (role === 'teacher' || role === 'admin') {
       if (role === 'teacher' && who && who.cls !== ROLE.cls) return who.name + ' is in ' + who.cls + ', which is outside your class. Teacher accounts see their own class only.';
       var scopeTxt = scope ? scope + ' (' + pool.length + ' students)' : 'all ' + CLASSES.length + ' sections (' + pool.length + ' students)';
+      var rk = rankAnswer(L); if (rk) return rk;
       if (/feedback|satisfaction|rating|complain/.test(L)) { var cfs = scope ? [classFb(scope)] : CLASSES.map(function (c) { var x = classFb(c.id); x.id = c.id; return x; }); return (scope ? 'Student feedback for ' + scopeTxt + ': ' + cfs[0].n + ' submissions' + (cfs[0].avg !== null ? ', average ' + r1(cfs[0].avg) + ' of 5' : '') + '; survey satisfaction ' + r1(cfs[0].seeded) + ' of 5. ' + (cfs[0].items.length ? 'Latest (anonymous): "' + cfs[0].items[0].text + '" (' + (cfs[0].items[0].subj === null ? 'course' : SUBJECTS[cfs[0].items[0].subj]) + ', ' + cfs[0].items[0].rating + ' of 5).' : 'No comments yet.') : 'Feedback by class: ' + cfs.map(function (x) { return x.id + ' ' + x.n + ' submissions' + (x.avg !== null ? ' avg ' + r1(x.avg) : '') + ', survey ' + r1(x.seeded); }).join('; ') + '.') + ' Low ratings are prompts to look, not verdicts on teaching.' + demo; }
       if (/predict|forecast|early warning|probability|trajectory|next semester|likely to/.test(L)) { if (who) { var rw = riskModel(who.id), td = rw.parts.filter(function (x) { return x.value !== null && x.contrib > 0.05; }).slice(0, 3); return who.name + ': predicted academic risk next semester ' + (rw.level === 'insufficient' ? 'not estimated (fewer than 6 scored assessments)' : rw.pct + '% (' + RISK_LABEL[rw.level] + ')') + (rw.traj.slope !== null ? '; trajectory ' + (rw.traj.slope >= 0 ? '+' : '') + r1(rw.traj.slope) + ' points per semester, projected ' + Math.round(rw.traj.next) : '') + (td.length ? '. Pushing it up: ' + td.map(function (x) { return x.label + ' ' + x.value; }).join(', ') : '') + '. Transparent logistic model with hand-set coefficients; see the Method page.' + demo; } var hi = pool.filter(function (s) { return riskModel(s.id).level === 'high'; }), wn = pool.filter(function (s) { return riskModel(s.id).warn; }); return 'Predicted high academic risk next semester in ' + scopeTxt + ': ' + hi.length + ' student' + (hi.length === 1 ? '' : 's') + (hi.length ? ' (' + hi.slice(0, 8).map(function (s) { return s.name + ' ' + riskModel(s.id).pct + '%'; }).join(', ') + (hi.length > 8 ? ', …' : '') + ')' : '') + '; ' + wn.length + ' early warning' + (wn.length === 1 ? '' : 's') + ' from a falling trajectory (4+ points per semester). Model: logistic on average, attendance, LMS, backlogs, trajectory and missing work; filter the admin directory by "Predicted: high risk".' + demo; }
       if (/import|csv|pipeline|clean|duplicate|data quality|data source|integrat/.test(L)) { var Qd = QUALITY; return 'Active dataset: ' + DATASET.name + ' (' + DATASET.origin + '). ' + Qd.students + ' students joined on student_id from ' + Object.keys(SRC_META).filter(function (k) { return k !== 'students' && Qd.sources[k]; }).length + ' of 7 source tables, ' + Qd.assessments.toLocaleString() + ' assessment rows. Cleaning: ' + Qd.fixes.join('; ') + '. Admins can import their own CSVs from the Data integration pipeline card.' + demo; }
       if (/placement|readiness|aptitude|coding score|mock interview/.test(L)) { var pls = pool.filter(function (s) { return placementFlag(s.id) === 'pl_support'; }), plm = pool.filter(function (s) { return placementFlag(s.id) === 'pl_monitor'; }), hl = pool.filter(function (s) { return segmentOf(s.id) === 'hi_acad_lo_plc'; }); return 'Placement outcome risk in ' + scopeTxt + ': ' + pls.length + ' student' + (pls.length === 1 ? '' : 's') + ' with readiness under 50 (' + (pls.map(function (s) { return s.name + ' ' + Math.round(placementScore(s.id).score); }).join(', ') || 'none') + '), ' + plm.length + ' between 50 and 64. ' + (hl.length ? 'High academic but low placement readiness: ' + listNames(hl) + '. ' : '') + 'Readiness = aptitude 30% + coding 30% + mock interview 25% + technical skills and certifications 15%.' + demo; }
       if (/segment|group|cluster/.test(L)) { var sc3 = {}; pool.forEach(function (s) { var g = segmentOf(s.id); (sc3[g] = sc3[g] || []).push(s.name); }); return 'Segments in ' + scopeTxt + ': ' + SEGMENTS.filter(function (s) { return sc3[s[0]]; }).map(function (s) { return s[1] + ' (' + sc3[s[0]].length + ': ' + sc3[s[0]].join(', ') + ')'; }).join('; ') + '. Rule-based, one segment per student; the admin dashboard filters by them.' + demo; }
-      if (/success score|driver|contribut/.test(L)) { if (who) { var S2 = successScore(who.id), tp = S2.parts.filter(function (p) { return p.raw !== null; }).sort(function (a, b) { return b.contrib - a.contrib; }); return who.name + ': success score ' + Math.round(S2.score) + ' (' + S2.n + ' of ' + S2.total + ' indicators). Drivers: ' + tp.map(function (p) { return p.label + ' +' + r1(p.contrib) + ' (' + p.raw + ' × ' + Math.round(p.weight * 100) + '%)'; }).join(', ') + '. Placement readiness ' + Math.round(placementScore(who.id).score) + ', segment: ' + segLabel(segmentOf(who.id)) + '.' + demo; } var vals = pool.map(function (s) { return successScore(s.id).score; }).filter(function (v) { return v !== null; }).sort(function (a, b) { return a - b; }); return 'Success score in ' + scopeTxt + ': average ' + Math.round(mean(vals)) + ', lowest ' + Math.round(vals[0]) + ', highest ' + Math.round(vals[vals.length - 1]) + '. ' + vals.filter(function (v) { return v < 50; }).length + ' students under 50. Weights: academic 35%, attendance 15%, LMS 15%, engagement 15%, skills 10%, satisfaction 10%; missing indicators are excluded and weights rescaled.' + demo; }
+      if (/success score|driver/.test(L) || (/contribut/.test(L) && !/status|evidence|support|flag|signal/.test(L))) { if (who) { var S2 = successScore(who.id), tp = S2.parts.filter(function (p) { return p.raw !== null; }).sort(function (a, b) { return b.contrib - a.contrib; }); return who.name + ': success score ' + Math.round(S2.score) + ' (' + S2.n + ' of ' + S2.total + ' indicators). Drivers: ' + tp.map(function (p) { return p.label + ' +' + r1(p.contrib) + ' (' + p.raw + ' × ' + Math.round(p.weight * 100) + '%)'; }).join(', ') + '. Placement readiness ' + Math.round(placementScore(who.id).score) + ', segment: ' + segLabel(segmentOf(who.id)) + '.' + demo; } var vals = pool.map(function (s) { return successScore(s.id).score; }).filter(function (v) { return v !== null; }).sort(function (a, b) { return a - b; }); return 'Success score in ' + scopeTxt + ': average ' + Math.round(mean(vals)) + ', lowest ' + Math.round(vals[0]) + ', highest ' + Math.round(vals[vals.length - 1]) + '. ' + vals.filter(function (v) { return v < 50; }).length + ' students under 50. Weights: academic 35%, attendance 15%, LMS 15%, engagement 15%, skills 10%, satisfaction 10%; missing indicators are excluded and weights rescaled.' + demo; }
       if (/interventions?|follow[- ]?ups?/.test(L) && /await|pending|due|require|need|how many|open|outstanding/.test(L)) { var ivs = IV.filter(function (iv) { return !scope || iv.cls === scope; }), due = ivs.filter(function (iv) { return ivStatus(iv) === 'follow_due'; }), open = ivs.filter(function (iv) { return ['planned', 'in_progress'].indexOf(ivStatus(iv)) >= 0; }); return 'In ' + scopeTxt + ': ' + due.length + ' intervention' + (due.length === 1 ? '' : 's') + ' with a follow-up date passed and no assessment since (' + (due.map(function (iv) { return (iv.sid ? BYSID[iv.sid].name : 'whole ' + iv.cls) + ', ' + SUBJECTS[iv.subj] + ', due ' + fmtD(iv.follow); }).join('; ') || 'none') + '), plus ' + open.length + ' planned or in progress. Rule: follow-up due = follow-up date before today and no scored assessment after the adjustment.' + demo; }
       if (/latest|last|recent/.test(L) && /follow|change|outcome|intervention/.test(L)) { var done = IV.filter(function (iv) { return (!scope || iv.cls === scope) && ivOutcome(iv).na > 0; }).sort(function (a, b) { return a.date < b.date ? 1 : -1; })[0]; if (!done) return 'No intervention in ' + scopeTxt + ' has a scored assessment after its adjustment date yet, so no outcome has been measured.'; var o = ivOutcome(done); return (done.sid ? BYSID[done.sid].name : 'Whole ' + done.cls) + ', ' + SUBJECTS[done.subj] + ', adjusted ' + fmtD(done.date) + ' (' + done.strategy + '): before ' + r1(o.before) + ' (' + o.nb + ' assessments), after ' + r1(o.after) + ' (' + o.na + '), change ' + (o.change >= 0 ? '+' : '') + r1(o.change) + '. ' + ivReading(done).txt + demo; }
       if (/attendance|attend\b/.test(L) && /below|under|less than|low/.test(L)) { var th = (L.match(/(\d{2})\s?%/) || [])[1], T2 = th ? +th : RULES.att, low = pool.filter(function (s) { var p = attOf(s.id).p; return p !== null && p < T2; }); return low.length ? low.length + ' student' + (low.length === 1 ? '' : 's') + ' in ' + scopeTxt + ' below ' + T2 + '%: ' + low.map(function (s) { var a = attOf(s.id); return s.name + ' ' + r1(a.p) + '% (' + a.a + '/' + a.t + ')'; }).join(', ') + '. Whole year, all subjects. Attendance is context, not evidence about effort.' + demo : 'No student in ' + scopeTxt + ' is below ' + T2 + '% attendance for the year.' + demo; }
@@ -1908,6 +1973,25 @@
       return 'I could not match that to a dataset question. I can answer about attendance, declining results, students who may benefit from a check-in, the evidence behind a status, class-wide concepts, teaching adjustments and intervention follow-ups' + (role === 'admin' ? ', per class or across the campus' : '') + '. I do not invent figures that are not in the records.';
     }
     return null;
+  }
+  /* class / section ranking: "which section has the most at-risk students", "lowest attendance by class", "which class improved most" */
+  function rankAnswer(L) {
+    var asksRank = /(which|what) (class|section|course|batch)|(class|section)(es|s)? (has|have|with|is|are)|by (class|section)|rank|compare (the )?(class|section)|across (the )?(class|section)|(most|highest|lowest|least|fewest|worst|best|top|bottom)\b.*(class|section)|(class|section).*(most|highest|lowest|least|fewest|worst|best)/.test(L);
+    if (!asksRank || clsIn(L)) return null;
+    var low = /lowest|least|fewest|worst|bottom|weakest|poorest|smallest/.test(L) && !/worst (attendance|results|performance)/.test(L) ? true : false;
+    var M = null;
+    if (/at risk|risk|flag|priority|support|struggl|check[- ]?in/.test(L) && !/placement/.test(L)) M = { name: 'share of students with an academic flag (priority review or support recommended)', f: function (c) { var cs = classStudents(c.id), n = cs.filter(function (s) { var l = cls(s.id).level; return l === 'priority' || l === 'support'; }).length; return { v: n / (cs.length || 1) * 100, txt: n + ' of ' + cs.length + ' (' + Math.round(n / (cs.length || 1) * 100) + '%)' }; } };
+    else if (/placement|readiness/.test(L)) M = { name: 'share of students with placement readiness under 50', f: function (c) { var cs = classStudents(c.id), n = cs.filter(function (s) { return placementFlag(s.id) === 'pl_support'; }).length; return { v: n / (cs.length || 1) * 100, txt: n + ' of ' + cs.length }; } };
+    else if (/attend/.test(L)) M = { name: 'attendance (whole year)', f: function (c) { var v = classAtt(c.id); return { v: v, txt: r1(v) + '%' }; } };
+    else if (/improv|declin|drop|fall|change|trend|progress|grow/.test(L)) { if (/declin|drop|fall/.test(L)) low = true; M = { name: 'change in section average from Sem 3 to Sem 5', f: function (c) { var a = classAvg(c.id, 0), b = classAvg(c.id, 2), d = a === null || b === null ? null : b - a; return { v: d, txt: d === null ? 'no data' : (d >= 0 ? '+' : '') + r1(d) + ' (' + r1(a) + ' → ' + r1(b) + ')' }; } }; }
+    else if (/success/.test(L)) M = { name: 'average success score', f: function (c) { var v = classStudents(c.id).map(function (s) { return successScore(s.id).score; }).filter(function (x) { return x !== null; }); var m = v.length ? mean(v) : null; return { v: m, txt: m === null ? 'no data' : String(Math.round(m)) }; } };
+    else if (/score|marks|average|perform|result|grade|academic/.test(L)) M = { name: 'Sem 5 average score', f: function (c) { var v = classAvg(c.id, 2); return { v: v, txt: r1(v) }; } };
+    else if (/missing|incomplete|complete/.test(L)) M = { name: 'number of assessments without a recorded score', f: function (c) { var x = completeness(c.id); return { v: x.missing, txt: x.missing + ' (' + r1(x.p) + '% complete)' }; } };
+    if (!M) return null;
+    var rows = CLASSES.map(function (c) { var r = M.f(c); r.c = c; return r; }).filter(function (r) { return r.v !== null && !isNaN(r.v); }).sort(function (a, b) { return low ? a.v - b.v : b.v - a.v; });
+    if (!rows.length) return null;
+    var top = rows[0], dir = low ? 'lowest' : 'highest', big = rows.filter(function (r) { return classStudents(r.c.id).length >= 30; })[0], small = classStudents(top.c.id).length < 15 && big && big !== top;
+    return top.c.name + ' (' + top.c.course + ') has the ' + dir + ' ' + M.name + ': ' + top.txt + '.' + (small ? ' It is a small section (' + classStudents(top.c.id).length + ' students); among sections with 30+ students, ' + big.c.id + ' is ' + dir + ' at ' + big.txt + '.' : '') + ' Full ranking: ' + rows.map(function (r, i) { return (i + 1) + '. ' + r.c.id + ' ' + r.txt; }).join('; ') + '. Computed from all ' + STUDENTS.length + ' students in the active dataset; the admin dashboard charts show the same comparison, and clicking a section filters it. (Fictional demo data.)';
   }
   function askSuggest() { var box = $('#sg'); box.innerHTML = ''; (ASK_SUGGEST[ROLE.role || 'none']).forEach(function (q) { var b = el('button', 'chip', q); b.type = 'button'; b.addEventListener('click', function () { if (orbUI) orbUI.ask(q); }); box.appendChild(b); }); }
   function askNote() { var n = $('#chatNote'); n.textContent = (ROLE.role ? ({ student: 'Student view: answers use Aarav\'s own records only. ', teacher: 'Teacher view: answers use Section CSE-A records. ', admin: 'Admin view: answers cover every section. ' })[ROLE.role] : 'Public view: answers use the sample student. ') + (aiReady() ? 'Verified figures are calculated first; the configured AI explains them.' : 'Works offline: every answer is calculated by deterministic rules from the active dataset, so it needs no API key. An optional AI layer only rephrases verified figures.') + ' Press Escape to cancel.'; }
@@ -1993,9 +2077,12 @@
       var C = CONFIG.supabase;
       return sbClient.from(C.profilesTable).select(C.roleColumn + ', full_name, student_id').eq(C.idColumn, sess.user.id).maybeSingle().then(function (q) {
         if (my !== AUTH.seq) return;
-        if (q.error) { sbClear(); authSet('error', 'Could not read your profile (' + (q.error.code || 'database') + '). If this persists, ask an administrator to check the profiles table and its access policies.'); route(); return; }
-        var row = q.data, role = row && String(row[C.roleColumn] || '').toLowerCase().trim();
-        if (!row) { sbClear(); authSet('denied', 'No profile exists for this account yet, so no dashboard can be opened. Ask an administrator to create one.'); route(); return; }
+        /* the profiles table is not set up yet (PGRST205 / 42P01) or this account has no profile row yet: open the student view, never a dead end */
+        var noTable = q.error && /PGRST205|42P01|PGRST116/.test(String(q.error.code || '') + ' ' + String(q.error.message || ''));
+        if (q.error && !noTable) { sbClear(); authSet('error', 'Could not read your profile (' + (q.error.code || 'database') + '). If this persists, ask an administrator to check the profiles table and its access policies.'); route(); return; }
+        var row = noTable ? null : q.data;
+        if (!row) { row = {}; row[C.roleColumn] = 'student'; row.full_name = (sess.user.user_metadata && sess.user.user_metadata.full_name) || ''; toast('Signed in. Opening the student view; an administrator can assign a teacher or admin role.'); }
+        var role = String(row[C.roleColumn] || '').toLowerCase().trim();
         if (ALLOWED_ROLES.indexOf(role) < 0) { sbClear(); authSet('denied', 'This account has ' + (role ? 'an unrecognised role ("' + role + '")' : 'no role assigned') + '. Access is not granted until an administrator assigns student, teacher or admin.'); route(); return; }
         AUTH.role = role; setRole(role, { name: (row.full_name || sess.user.email || '').split('@')[0], uid: sess.user.id, sid: row.student_id }); authSet('ready'); sbSync();
         var want = (location.hash || '').replace('#', ''), home = ROLE_DEF[role].home;
@@ -2010,7 +2097,7 @@
     p.then(function (r) {
       if (r.error) { setErr(pass, $('#passErr'), r.error.message && /invalid|credentials/i.test(r.error.message) ? 'Email or password is incorrect.' : (r.error.message || 'Sign-in failed.')); $('#formStatus').textContent = 'Sign-in failed.'; return; }
       pass.value = ''; $('#strength').dataset.n = 0;
-      if (signUp && r.data && !r.data.session) { $('#formStatus').textContent = 'Check your email to confirm the account, then log in.'; setErr(email, $('#emailErr'), ''); toast('Account created. Confirm your email, then log in.'); return; }
+      if (signUp && r.data && !r.data.session) { $('#formStatus').textContent = 'Check your email to confirm the account, then log in. In the meantime, open a demo account above.'; setErr(email, $('#emailErr'), ''); toast('Account created. Confirm your email, then log in.'); return; }
       /* onAuthStateChange(SIGNED_IN) triggers sbResolve; call directly too in case the event already fired */
       sbResolve();
     }).catch(function (e) { $('#formStatus').textContent = 'Network error. Try again.'; setErr(pass, $('#passErr'), 'Could not reach the authentication service.'); }).then(function () { btn.disabled = false; });
@@ -2051,6 +2138,7 @@
     var changed = v !== current, feat = pageIdx(v) >= 0, dash = v === 'app' || v === 'teacher' || v === 'ti' || v === 'admin' || v === 'profile';
     if (changed && current === 'journey' && window.__gxJourneyKill) window.__gxJourneyKill();
     Object.keys(views).forEach(function (k) { views[k].hidden = k !== v; });
+    document.body.classList.toggle('is-dash', dash);
     current = v;
     $('#topLogin').hidden = !(v === 'home' || feat) || !!ROLE.role; $('#navList').hidden = !(v === 'home' || feat || dash); $('#dots').hidden = v !== 'home';
     if (v === 'teacher') renderTeacher();
@@ -2173,14 +2261,16 @@
       top: { x: 2.4, y: -.6, s: 1, o: .35, a: 1 }, problem: { x: 2.6, y: -.4, s: .85, o: 0, a: 1 }, gap: { x: 2.8, y: -.4, s: .8, o: .55, a: .7 },
       glance: { x: 0, y: -.8, s: 1.5, o: 1, a: .25 }, progress: { x: 3.2, y: -.8, s: .7, o: 1, a: .35 }, journey: { x: 3.2, y: -.8, s: .7, o: 1, a: .25 }, sim: { x: 3.4, y: -.6, s: .75, o: 1, a: .45 }, planner: { x: 3.4, y: -.6, s: .75, o: 1, a: .4 }, attendance: { x: 3.4, y: -.6, s: .75, o: 1, a: .4 }, cgpa: { x: 3.4, y: -.6, s: .75, o: 1, a: .4 }, timetable: { x: 3.4, y: -.6, s: .75, o: 1, a: .4 }, explore: { x: 3.2, y: -.6, s: .8, o: 1, a: .4 },
       ask: { x: 3.2, y: -.6, s: .8, o: 1, a: .4 }, how: { x: 3.4, y: -.6, s: .7, o: 1, a: .35 }, end: { x: 0, y: -.9, s: 1.2, o: 1, a: 1 },
-      login: { x: -2.6, y: -.6, s: .9, o: 1, a: .7 }, app: { x: 0, y: -.6, s: .6, o: 1, a: .25 }, teacher: { x: 0, y: -.6, s: .6, o: 1, a: .25 }
+      login: { x: -2.6, y: -.6, s: .9, o: 1, a: .35 }, app: { x: 0, y: -.6, s: .6, o: 1, a: .18 }, teacher: { x: 0, y: -.6, s: .6, o: 1, a: .15 },
+      ti: { x: 0, y: -.6, s: .6, o: 1, a: .12 }, admin: { x: 0, y: -.6, s: .6, o: 1, a: .12 }, profile: { x: 0, y: -.6, s: .6, o: 1, a: .12 }
     };
     /* where the orbit system sits and how visible it is in each section (q is opacity) */
     var OST = {
       top: { x: 3.3, y: 4.6, s: .5, q: .95 }, problem: { x: 3.4, y: 2.4, s: .8, q: 0 }, gap: { x: 3.6, y: 1.2, s: .9, q: 1 },
       glance: { x: 0, y: 1, s: 1, q: 0 }, progress: { x: 3.4, y: 1, s: .8, q: 0 }, journey: { x: 3.4, y: 1, s: .8, q: 0 }, sim: { x: 3.4, y: 1, s: .8, q: 0 }, planner: { x: 3.4, y: 1, s: .8, q: 0 }, attendance: { x: 3.4, y: 1, s: .8, q: 0 }, cgpa: { x: 3.4, y: 1, s: .8, q: 0 }, timetable: { x: 3.4, y: 1, s: .8, q: 0 }, explore: { x: 3.4, y: 1, s: .8, q: 0 },
       ask: { x: 3.4, y: 1, s: .8, q: 0 }, how: { x: 3.6, y: 1.2, s: .9, q: 1 }, end: { x: 5.1, y: 3.4, s: .5, q: .9 },
-      login: { x: 0, y: 1, s: .8, q: 0 }, app: { x: 0, y: 1, s: .8, q: 0 }, teacher: { x: 0, y: 1, s: .8, q: 0 }
+      login: { x: 0, y: 1, s: .8, q: 0 }, app: { x: 0, y: 1, s: .8, q: 0 }, teacher: { x: 0, y: 1, s: .8, q: 0 },
+      ti: { x: 0, y: 1, s: .8, q: 0 }, admin: { x: 0, y: 1, s: .8, q: 0 }, profile: { x: 0, y: 1, s: .8, q: 0 }
     };
     var st = ST.top, ost = OST.top, oq = 0, or = .35, mx = 0, my = 0, t = 0, P = 0, hoverCol = null;
     window.addEventListener('pointermove', function (e) { mx = e.clientX / window.innerWidth - .5; my = e.clientY / window.innerHeight - .5; });
