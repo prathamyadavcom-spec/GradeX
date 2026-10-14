@@ -1,0 +1,1179 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Gradex</title><meta name="theme-color" content="#05080f"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap"><link rel="stylesheet" href="style.css"></head><body>
+
+
+
+
+<div id="prog" aria-hidden="true"></div>
+<div id="fb" aria-hidden="true"></div>
+<div class="orb a" aria-hidden="true"></div><div class="orb b" aria-hidden="true"></div>
+<canvas id="gl" aria-hidden="true"></canvas>
+
+<nav class="nav" aria-label="Primary">
+  <div class="brand">
+    <a class="logo" href="#top">GRADE<b>X</b></a>
+    <div class="hnav" aria-label="History">
+      <button type="button" id="hBack" title="Back (Alt+←)" aria-label="Back" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button type="button" id="hFwd" title="Forward (Alt+→)" aria-label="Forward" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+  </div>
+  <ul id="navList">
+    <li><a href="#top">Home</a></li>
+    <li><a href="#glance">At a glance</a></li>
+    <li><a href="#progress">Progress</a></li>
+    <li><a href="#sim">Simulator</a></li>
+    <li><a href="#attendance">Attendance</a></li>
+    <li><a href="#ask">Ask Gradex</a></li>
+    <li><a href="#success">Success Score</a></li>
+    <li><a href="#method">Method</a></li>
+    <li id="navTeach" hidden><a href="#teacher">Teacher</a></li>
+    <li id="navTI" hidden><a href="#ti">Teaching Intelligence</a></li>
+    <li id="navAdmin" hidden><a href="#admin">Admin</a></li>
+  </ul>
+  <div class="nav-actions">
+    <details class="pgm" id="navPages">
+      <summary class="pgm-dots" aria-label="All pages" title="All pages"><i></i><i></i><i></i></summary>
+      <div class="pgm-panel" id="pgmPanel"></div>
+    </details>
+    <a class="btn sm nav-home" id="navHome" href="#top" title="Home" aria-label="Home"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg></a>
+    <a class="btn sm rolebtn" id="roleBtn" href="#login" hidden title="Switch demo role"></a>
+    <a class="btn sm" id="topLogin" href="#login">Log in</a>
+    <a class="btn sm p join-link nav-join" href="#end">Join the waitlist</a>
+  </div>
+</nav>
+<nav class="dots" id="dots" aria-label="Sections"></nav>
+
+
+<main>
+  <!-- ================= HOME ================= -->
+  <div id="view-home">
+    <section id="top" class="in">
+      <div class="w hero">
+        <div>
+          <p class="tagline">Understand Every Learner. Improve Every Lesson.</p>
+          <p class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.7 5.7 3.7 9S14.5 18.4 12 21c-2.5-2.6-3.7-5.7-3.7-9S9.5 5.6 12 3Z"/></svg><span>Analytics &amp; AI student success platform<br>for colleges: students, faculty, administrators</span></p>
+          <h1><span class="l"><span>Every student,</span></span><span class="l"><span>every signal,</span></span><span class="l"><span><em>one clear score.</em></span></span></h1>
+          <p class="sub">Gradex joins academic, attendance, LMS, engagement, placement, skills and feedback data into one unified student view, an explainable Student Success Score, predicted risk, segments and tracked interventions. Built for the KPMG Smart Campus Analytics challenge.</p>
+          <div class="cta">
+            <a class="btn go" href="#admin" data-role="admin" data-go="admin">Open the campus dashboard<span class="dot" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12M11 5l5 5-5 5"/></svg></span></a>
+            <a class="btn" href="#ti" data-role="teacher" data-go="ti">Teaching Intelligence</a>
+            <a class="btn" href="#login">Student view</a>
+          </div>
+                    <ul class="stats">
+            <li class="card stat"><span class="sv" id="statN"></span><span class="sl">Students integrated from 7 source tables</span></li>
+            <li class="card stat"><span class="sv" id="statRisk"></span><span class="sl">Flagged for academic or placement support</span></li>
+            <li class="card stat"><span class="sv" id="statAvg"></span><span class="sl">Sample student average, Sem 3 to Sem 5</span></li>
+            <li class="card stat"><span class="sv" id="statLow"></span><span class="sl">Sample student's lowest subject</span></li>
+          </ul>
+          <div class="seq" id="seq"><b>Record</b>→<b>See</b>→<b>Compare</b>→<b>Plan</b>→<b>Improve</b></div>
+        </div>
+        <div class="card report" aria-labelledby="repTitle">
+          <h3 id="repTitle">Sample semester report</h3>
+          <div class="chips" id="termBtns" role="group" aria-label="Choose a semester"></div>
+          <div class="chips" id="subjBtns" role="group" aria-label="Choose a subject"></div>
+          <div class="ro" aria-live="polite">
+            <span class="m" id="roName"></span>
+            <span class="big" id="roScore"></span>
+            <span class="m" id="roTrend"></span>
+            <span class="tag" id="roTag"></span>
+          </div>
+          <ul class="bars-mini" id="miniBars"></ul>
+          <p class="fine">Sample data. The 3D scene shows the same six subjects.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="mq" aria-hidden="true"><div class="mt" id="mt"></div></div>
+
+    <section id="problem">
+      <div class="w">
+        <div class="k" data-r>THE PROBLEM</div>
+        <h2><span class="l"><span>A mark tells you how you did.</span></span><span class="l"><span><em>Not why.</em></span></span></h2>
+        <p class="sub" data-r>Internal marks, attendance, LMS logs, placement scores and feedback arrive in separate systems, one at a time. By the time anyone sees a pattern, the semester is over.</p>
+        <div class="tgh" id="tgh" aria-label="A stream of sample score cards curving past" role="img">
+          <div class="tgh-copy"><span>EIGHTEEN SCORES, THREE SEMESTERS</span><span>SAMPLE</span></div>
+        </div>
+        <div class="g">
+          <div class="card" data-r><div class="big">Seven systems</div></div>
+          <div class="card" data-r style="--d:1"><div class="big">Hundreds of students</div></div>
+          <div class="card" data-r style="--d:2"><div class="big bd">No unified view</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="gap">
+      <div class="w">
+        <div class="k" data-r>THE GAP</div>
+        <h2 data-r>A report card tells you <em>what happened.</em></h2>
+        <p class="sub" data-r>Gradex adds the four steps a report card never takes. Each step on the right is a real page: tap it to open it.</p>
+        <div class="two">
+          <div class="card"><div class="m">REPORT CARD</div><div class="flow"><div>Record</div><div>Grade</div><div>File away</div></div></div>
+          <div class="card" style="border-color: rgba(90,209,245,.4)"><div class="m" style="color: var(--cy); display:flex; justify-content:space-between"><span>GRADEX</span><span style="color:var(--mut)">tap a step to open it</span></div><div class="flow a">
+            <a href="#app" data-feat="report"><span>Record</span><small>Semester report card</small><i>&rarr;</i></a>
+            <a href="#glance" data-feat="glance" style="--n:1"><span>See the pattern</span><small>At a glance: six rings, lowest first</small><i>&rarr;</i></a>
+            <a href="#progress" data-feat="progress" style="--n:2"><span>Compare semesters</span><small>Progress: Sem 3 vs Sem 5</small><i>&rarr;</i></a>
+            <a href="#sim" data-feat="sim" style="--n:3"><span>Plan what to study</span><small>What-if simulator</small><i>&rarr;</i></a>
+            <a href="#ti" data-feat="ti-tracker" style="--n:4"><span>Improve</span><small>Intervention tracker: before and after</small><i>&rarr;</i></a>
+          </div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="explore">
+      <div class="w">
+        <div class="k" data-r>EXPLORE GRADEX</div>
+        <h2 data-r>Every feature, <em>one click away.</em></h2>
+        <p class="sub" data-r>Grouped by who uses it. Each link opens the right demo role for you, so there is no login step. The same map lives behind the ⋯ button in the top bar on every page.</p>
+        <div class="fmap" id="exGrid"></div>
+      </div>
+    </section>
+
+    <section id="campus">
+      <div class="w">
+        <div class="k" data-r>SMART CAMPUS ANALYTICS</div>
+        <h2 data-r>Understand every learner. <em>Improve every lesson.</em></h2>
+        <p class="sub" data-r>A report card says what happened. Gradex connects student analytics with teaching decisions and trackable support, on one fictional demo dataset shared by every role.</p>
+        <div class="flowq" aria-label="Core workflow">
+          <div class="card" data-r><span>01</span><b>Detect a gap</b><span class="m">Transparent rules over real records</span></div>
+          <div class="card" data-r style="--d:1"><span>02</span><b>Explain the evidence</b><span class="m">Scores, dates, comparison period</span></div>
+          <div class="card" data-r style="--d:2"><span>03</span><b>Adapt teaching</b><span class="m">Practical recommendations</span></div>
+          <div class="card" data-r style="--d:3"><span>04</span><b>Track support</b><span class="m">Record it, schedule a follow-up</span></div>
+          <div class="card" data-r style="--d:4"><span>05</span><b>Measure the change</b><span class="m">Before and after, no causal claims</span></div>
+        </div>
+        <div class="grid3" style="margin-top: 24px">
+          <a class="card ex" href="#login" data-role="student" data-r><span class="ex-n">STUDENT</span><b>My dashboard</b><span class="ex-b">Progress, attendance, CGPA, timetable, support status in supportive language, and personal study suggestions.</span><span class="ex-go">Open as Aarav &rarr;</span></a>
+          <a class="card ex" href="#ti" data-role="teacher" data-go="ti" data-r style="--d:1"><span class="ex-n">TEACHER</span><b>Gradex Teaching Intelligence</b><span class="ex-b">Learning journeys, evidence-based gaps, a teaching advisor, class-wide insights and an intervention tracker.</span><span class="ex-go">Open as Prof. Rao &rarr;</span></a>
+          <a class="card ex" href="#login" data-role="admin" data-r style="--d:2"><span class="ex-n">ADMINISTRATOR</span><b>Campus analytics</b><span class="ex-b">Institution and class summaries, trends, support indicators, follow-up status and data completeness.</span><span class="ex-go">Open as admin &rarr;</span></a>
+        </div>
+        <p class="fine" style="margin-top: 16px" id="campusStat"></p>
+      </div>
+    </section>
+
+    <section class="fin" id="end">
+      <div class="w">
+        <div class="k">THE LAYER ABOVE THE REPORT CARD</div>
+        <h2><span class="l"><span>Every student deserves</span></span><span class="l"><span><em>to know why.</em></span></span></h2>
+        <div class="words"><i style="--d:1">RECORD.</i><i style="--d:2">SEE.</i><i style="--d:3">COMPARE.</i><i style="--d:4">PLAN.</i><i style="--d:5">IMPROVE.</i></div>
+        <div class="cta" style="justify-content: center; margin: 0">
+          <a class="btn p" id="joinBtn" href="#end">Join the waitlist</a>
+          <a class="btn" href="#login">Try the demo</a>
+        </div>
+        <p class="m" id="joinNote" style="margin-top: 14px"></p>
+        <p class="m" id="joinCount" style="margin-top: 4px"></p>
+        <div class="wm" aria-hidden="true">GRADEX</div>
+      </div>
+    </section>
+  </div>
+
+  <div id="view-glance" hidden>
+    <section id="glance">
+      <div class="w">
+        <div class="k" data-r>AT A GLANCE</div>
+        <h2 data-r>Your subjects, <em>in one screen.</em></h2>
+        <p class="sub" data-r>Six rings, one per subject. The lowest turns coral so it is the first thing you see.</p>
+        <div class="g" id="rings"></div>
+        <div class="two">
+          <div class="card" data-r><div class="m">SAMPLE INSIGHT</div><p style="margin: 8px 0 12px; font-size: 19px" id="insightText"></p><p class="ok" id="insightAct"></p></div>
+          <div class="card" data-r style="--d:1"><div class="m">GRADE BANDS</div><div class="rw"><span>A</span><b>85 and above</b></div><div class="rw"><span>B</span><b>70 to 84</b></div><div class="rw"><span>C</span><b>55 to 69</b></div><div class="rw"><span>D</span><b>40 to 54</b></div><p class="fine" style="margin-top: 12px">Sample scale. Your institution's bands can replace these.</p></div>
+        </div>
+        <div class="pgfoot"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="view-progress" hidden>
+    <section id="progress">
+      <div class="w">
+        <div class="k" data-r>PROGRESS</div>
+        <h2 data-r>Don't just see the score. <em>See where it's going.</em></h2>
+        <div class="two">
+          <div class="card" data-r><div class="m">SEM 3 vs SEM 5, SAMPLE</div>
+            <svg class="chart" id="chart" viewBox="0 0 640 230" role="img" aria-label="Sample scores for six subjects in Sem 3 and Sem 5"></svg>
+            <div class="legend"><span><i style="background: rgba(138,168,255,.55)"></i>Sem 3</span><span><i style="background: var(--cy)"></i>Sem 5</span></div>
+          </div>
+          <div class="card" data-r style="--d:1; border-color: rgba(255,101,116,.4)">
+            <div class="bd" style="font-size: 13px; letter-spacing: .15em">LOWEST SUBJECT, SEM 3</div>
+            <div id="riskRows"></div>
+            <p class="ok" style="margin-top: 14px; font-size: 15px" id="riskAct"></p>
+          </div>
+        </div>
+        <div class="pgfoot"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="view-journey" hidden>
+    <section id="journey" aria-label="Semester journey">
+      <div class="jn-pin">
+        <div class="jn-track" id="jnTrack">
+          <div class="jn-img">
+            <div class="card">
+              <div><div class="k" style="margin-bottom: 12px">THE JOURNEY</div><h3 style="font-size: clamp(1.4rem, 2.4vw, 2.2rem); font-weight: 500; letter-spacing: -.03em; line-height: 1.05">Three terms, one sample student.</h3></div>
+              <svg class="chart" id="jnChart" viewBox="0 0 320 150" role="img" aria-label="Sample average by term"></svg>
+              <p class="fine">Keep scrolling. The track slides sideways and each milestone draws in as it reaches the centre.</p>
+            </div>
+          </div>
+          <div class="jn-body">
+            <div class="jn-line" aria-hidden="true"><i></i><b id="jnLine"></b><i></i></div>
+            <div class="jn-half">
+              <div class="jn-head"><h3>Semester journey</h3></div>
+              <div class="jn-items top" id="jnTop"></div>
+            </div>
+            <div class="jn-half">
+              <div class="jn-head"><p>Sem 3 to Sem 5</p></div>
+              <div class="jn-items bottom" id="jnBottom"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="w" style="padding-bottom: 80px"><div class="pgfoot"></div></div>
+  </div>
+
+  <div id="view-sim" hidden>
+    <section id="sim">
+      <div class="w">
+        <div class="k" data-r>WHAT-IF SIMULATOR</div>
+        <h2><span class="l"><span>Before the next test,</span></span><span class="l"><span><em>ask what it would take.</em></span></span></h2>
+        <div class="sim">
+          <div class="card rng">
+            <div class="m">YOUR PLAN</div>
+            <label for="simSubj" style="margin-top: 14px">Subject to work on <b id="simSubjName"></b></label>
+            <div class="chips" id="simSubj" role="group" aria-label="Subject to work on" style="margin-top: 8px"></div>
+            <label for="simGain">Points you aim to gain <b id="simGainV"></b></label>
+            <input id="simGain" type="range" min="0" max="30" step="1" value="10" aria-label="Points to gain">
+            <div class="rw"><span>Current score</span><b id="simCur"></b></div>
+            <div class="rw"><span>Current grade</span><b id="simCurG"></b></div>
+            <div class="rw"><span>Current average</span><b id="simAvg"></b></div>
+            <div class="bts"><button class="btn" type="button" id="simB1">Reach the next band</button><button class="btn" type="button" id="simB2">Try the weakest</button></div>
+          </div>
+          <div class="card" aria-live="polite">
+            <div class="m">AFTER THE PLAN</div>
+            <div class="big" id="simAfter"></div>
+            <div class="gauge"><i id="simGi"></i><u id="simGu"></u></div>
+            <div class="m" style="display: flex; justify-content: space-between"><span>0</span><span>Next band</span><span>100</span></div>
+            <div class="verd" id="simVerd"></div>
+            <p class="m" style="font-size: 15px" id="simText"></p>
+          </div>
+        </div>
+        <div class="pgfoot"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="view-attendance" hidden>
+    <section id="attendance">
+      <div class="w">
+        <div class="k" data-r>ATTENDANCE</div>
+        <h2 data-r>Know how many classes <em>you can still miss.</em></h2>
+        <p class="sub" data-r>Set a target, log what you attended, and see how many classes you can skip, or must attend in a row. Every number is a sample you can change.</p>
+        <div class="pl-panel sim" id="plAtt" aria-label="Attendance">
+          <div class="card rng">
+            <div class="m">ATTENDANCE, <span id="atSubjName"></span></div>
+            <div class="chips" id="atSubj" role="group" aria-label="Subject" style="margin-top: 12px"></div>
+            <label for="atTarget">Target attendance <b id="atTargetV"></b></label>
+            <input id="atTarget" type="range" min="60" max="90" step="1" value="75">
+            <div class="pl-in">
+              <label>Attended<input class="input" id="atA" type="number" min="0" max="999" step="1" inputmode="numeric"></label>
+              <label>Total classes<input class="input" id="atT" type="number" min="0" max="999" step="1" inputmode="numeric"></label>
+            </div>
+            <div class="bts"><button class="btn" type="button" id="atPlus">I attended a class</button><button class="btn" type="button" id="atMiss">I missed a class</button></div>
+          </div>
+          <div class="card" aria-live="polite">
+            <div class="m">WHERE YOU STAND</div>
+            <div class="big" id="atPct"></div>
+            <div class="gauge"><i id="atG"></i><u id="atU"></u></div>
+            <div class="verd" id="atVerd"></div>
+            <p class="m" style="font-size: 15px" id="atText"></p>
+            <div id="atList" style="margin-top: 14px"></div>
+          </div>
+        </div>
+
+        <div class="cta" style="margin: 18px 0 0">
+          <button class="btn sm plReset" type="button">Reset the sample numbers</button>
+          <span class="fine plSave" role="status">Changes last until you close the page.</span>
+        </div>
+        <div class="pgfoot"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="view-cgpa" hidden>
+    <section id="cgpa">
+      <div class="w">
+        <div class="k" data-r>CGPA</div>
+        <h2 data-r>Your GPA, <em>semester by semester.</em></h2>
+        <p class="sub" data-r>Pick a semester, edit the credits, and see the GPA on a 10-point scale next to the three-semester average.</p>
+        <div class="pl-panel sim" id="plCgpa" aria-label="CGPA">
+          <div class="card">
+            <div class="m">CGPA CALCULATOR</div>
+            <div class="chips" id="cgTerm" role="group" aria-label="Semester" style="margin-top: 12px"></div>
+            <div class="tbl-wrap" style="margin-top: 8px">
+              <table>
+                <thead><tr><th>SUBJECT</th><th class="num">CREDITS</th><th class="num">SCORE</th><th class="num">POINTS</th></tr></thead>
+                <tbody id="cgRows"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card" aria-live="polite">
+            <div class="m">GPA FOR <span id="cgTermName"></span></div>
+            <div class="big" id="cgGpa"></div>
+            <div class="m" style="margin-top: 22px">AVERAGE OF SEM 3 TO 5</div>
+            <div class="big" id="cgCum"></div>
+            <p class="fine" style="margin-top: 16px">Sample 10-point scale: 90+ is 10, 80+ is 9, 70+ is 8, 60+ is 7, 50+ is 6, 40+ is 5. Credits are editable. Scores come from your saved scores, or the sample.</p>
+          </div>
+        </div>
+
+        <div class="cta" style="margin: 18px 0 0">
+          <button class="btn sm plReset" type="button">Reset the sample numbers</button>
+          <span class="fine plSave" role="status">Changes last until you close the page.</span>
+        </div>
+        <div class="pgfoot"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="view-timetable" hidden>
+    <section id="timetable">
+      <div class="w">
+        <div class="k" data-r>TIMETABLE</div>
+        <h2 data-r>Your week, <em>and what is on now.</em></h2>
+        <p class="sub" data-r>Pick a day to see every class and room. On today, the page shows the class you are in and the one coming next.</p>
+        <div class="pl-panel sim" id="plTt" aria-label="Timetable">
+          <div class="card">
+            <div class="m">WEEKLY TIMETABLE, SAMPLE</div>
+            <div class="chips" id="ttDays" role="group" aria-label="Day" style="margin-top: 12px"></div>
+            <ol class="tt" id="ttList"></ol>
+          </div>
+          <div class="card" aria-live="polite">
+            <div class="m" id="ttLab">NEXT UP</div>
+            <div class="big" id="ttBig"></div>
+            <p class="m" style="font-size: 15px; margin-top: 12px" id="ttText"></p>
+            <p class="fine" style="margin-top: 16px" id="ttClock"></p>
+          </div>
+        </div>
+
+        <div class="cta" style="margin: 18px 0 0">
+          <button class="btn sm plReset" type="button">Reset the sample numbers</button>
+          <span class="fine plSave" role="status">Changes last until you close the page.</span>
+        </div>
+        <div class="pgfoot"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="view-ask" hidden>
+    <section id="ask">
+      <div class="w">
+        <div class="k" data-r>ASK GRADEX</div>
+        <h2 data-r>Ask Gradex, <em>in plain words.</em></h2><p class="sub" data-r>Every answer is calculated from the active demo dataset for your role: the metric, the value, the period and the limits. Nothing is invented.</p>
+        <div class="mo-root" id="mo" data-phase="idle">
+          <div class="mo-bg" aria-hidden="true"></div>
+          <div class="mo-halo" aria-hidden="true"></div>
+          <p class="mo-hint">Ask Gradex answers from the demo dataset for your role. Type a question and send it.</p>
+          <div class="mo-log" id="moLog" aria-live="polite"></div>
+          <div class="mo-mover" id="moMover">
+            <span class="mo-trail" aria-hidden="true"></span><span class="mo-trail" aria-hidden="true"></span><span class="mo-trail" aria-hidden="true"></span><span class="mo-trail" aria-hidden="true"></span><span class="mo-trail" aria-hidden="true"></span><span class="mo-trail" aria-hidden="true"></span>
+            <div class="mo-actor" id="moActor">
+              <div class="mo-underglow" aria-hidden="true"></div>
+              <div class="mo-halo-green" aria-hidden="true"></div>
+              <div class="mo-surface" aria-hidden="true"><div class="mo-aurora"><i></i><i></i><i></i><i></i></div></div>
+              <div class="mo-ball" aria-hidden="true"></div>
+              <div class="mo-green" aria-hidden="true"></div>
+              <div class="mo-card" aria-hidden="true"></div>
+              <div class="mo-ring" aria-hidden="true"></div>
+              <form class="mo-input" id="moForm" autocomplete="off">
+                <svg class="mo-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3.5l1.7 4.8 4.8 1.7-4.8 1.7L10 16.5l-1.7-4.8L3.5 10l4.8-1.7L10 3.5z"/><path d="M18 14.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7.7-1.8z"/></svg>
+                <input class="mo-field" id="ci" type="text" maxlength="200" placeholder="Ask Gradex" aria-label="Ask Gradex" spellcheck="false">
+                <button type="submit" class="mo-send" id="moSend" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5.5 11.5L12 5l6.5 6.5"/></svg></button>
+              </form>
+              <canvas class="mo-orb" id="moOrb" aria-hidden="true"></canvas>
+              <div class="mo-pulse" id="moPulse" aria-hidden="true"></div>
+              <div class="mo-answer" id="moAnswer" tabindex="-1" role="group" aria-label="Answer">
+                <div class="mo-a-head"><i class="mo-a-dot" aria-hidden="true"></i><span>ANSWER</span></div>
+                <p class="mo-a-body" id="moBody"></p>
+              </div>
+            </div>
+          </div>
+          <div class="mo-status" id="moStatus" aria-hidden="true"></div>
+          <button type="button" class="btn sm mo-reset" id="moReset">New question</button>
+          <div class="mo-live" id="moLive" role="status" aria-live="polite"></div>
+        </div>
+        <div class="cb" style="margin-top: 16px">
+          <div class="sg" id="sg"></div>
+          <div class="sg rel" id="rel" aria-live="polite"></div>
+          <div class="seg" id="tier" role="group" aria-label="Answer depth" hidden>
+            <button class="chip" type="button" aria-pressed="false" data-t="quick">Quick<small>fast</small></button>
+            <button class="chip" type="button" aria-pressed="true" data-t="default">Balanced<small>default</small></button>
+            <button class="chip" type="button" aria-pressed="false" data-t="complex">Deep<small>best reasoning</small></button>
+          </div>
+          <div class="m" id="chatNote"></div>
+        </div>
+        <div class="pgfoot"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="view-success" hidden>
+    <section id="success">
+      <div class="w">
+        <div class="k" data-r>SMART CAMPUS ANALYTICS · NEW</div>
+        <h2 data-r>One student, seven sources, <em>one explainable score.</em></h2>
+        <p class="sub" data-r>Added for the Smart Campus Analytics challenge: academic, attendance, LMS, engagement, placement, skills and feedback records combined into a Student Success Score, a separate placement-readiness score, risk flags and segments. Pick any fictional student to see the drivers.</p>
+
+        <div class="card" data-r>
+          <div class="filters" style="margin-top: 0">
+            <span class="m">STUDENT</span>
+            <select class="select" id="scStudent" aria-label="Student"></select>
+            <span class="fine">Fictional demo data. Every number below is recalculated from this student's records.</span>
+          </div>
+        </div>
+        <div class="kpis" id="scKpis" style="margin-top: 16px"></div>
+        <div class="app-grid" style="margin-top: 16px">
+          <div class="card" data-r>
+            <div class="m" id="scSsHead">SUCCESS SCORE · DRIVERS</div>
+            <div id="scSs"></div>
+            <p class="fine" style="margin-top: 10px">Score = Σ indicator × weight. Academic 35%, attendance 15%, LMS 15%, engagement 15%, skills 10%, satisfaction 10%. Unavailable indicators are excluded and the weights rescaled; they never count as zero.</p>
+          </div>
+          <div class="card" data-r style="--d:1">
+            <div class="m" id="scPlHead">PLACEMENT READINESS · DRIVERS</div>
+            <div id="scPl"></div>
+            <p class="fine" style="margin-top: 10px">Kept separate from the success score on purpose: aptitude 30%, coding 30%, mock interview 25%, technical skills and certifications 15%. Under 50 = placement support, 50 to 64 = build readiness, 65+ = ready.</p>
+          </div>
+        </div>
+        <div class="card" data-r style="margin-top: 16px">
+          <div class="m">RISK FLAGS AND SEGMENT</div>
+          <div id="scFlags"></div>
+          <div class="m" style="margin-top: 20px">UNIFIED STUDENT VIEW, ALL SEVEN SOURCES</div>
+          <div class="uni" id="scUni"></div>
+        </div>
+
+        <div class="k" style="margin-top: 56px" data-r>ACROSS THE CAMPUS</div>
+        <h2 data-r>Where the <em>24 students</em> fall.</h2>
+        <div class="app-grid" style="margin-top: 28px">
+          <div class="card" data-r>
+            <div class="m">SUCCESS SCORE DISTRIBUTION</div>
+            <div class="dist" id="scDist" aria-hidden="true"></div>
+            <div class="dist-l" id="scDistL"></div>
+            <div class="m" style="margin-top: 20px">RISK FLAGS</div>
+            <div id="scRisk"></div>
+          </div>
+          <div class="card" data-r style="--d:1">
+            <div class="m">STUDENT SEGMENTS</div>
+            <div id="scSeg"></div>
+          </div>
+        </div>
+
+        <div class="k" style="margin-top: 56px" data-r>WHAT IS NEW TODAY</div>
+        <h2 data-r>From report card <em>to campus intelligence.</em></h2>
+        <div class="ex-grid" id="scNew" style="margin-top: 28px"></div>
+        <div class="cta" style="margin-top: 28px">
+          <a class="btn go" href="#login" data-role="admin">Open the admin dashboard<span class="dot" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12M11 5l5 5-5 5"/></svg></span></a>
+          <a class="btn" href="#ti" data-role="teacher" data-go="ti">Open Teaching Intelligence</a>
+          <a class="btn" href="#login" data-role="student">Open the student view</a>
+        </div>
+        <div class="pgfoot"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="view-how" hidden>
+    <section id="how">
+      <div class="w">
+        <div class="k" data-r>HOW IT WORKS</div>
+        <h2 data-r>From scores <em>to a plan.</em></h2>
+        <div class="lay">
+          <div class="card" data-r><b>Scores</b><span>Tests, assignments, exams, per subject</span></div>
+          <div class="card" data-r style="--d:1"><b>Grade bands</b><span>Each score placed against A, B, C and D</span></div>
+          <div class="card" data-r style="--d:2"><b>Semester comparison</b><span>What moved up, what moved down, by how much</span></div>
+          <div class="card" data-r style="--d:3"><b>Study list</b><span>Weakest subjects first, with the points needed for the next band</span></div>
+          <div class="card" data-r style="--d:4; border-color: var(--cy)"><b>Your plan, then the next semester proves it</b></div>
+        </div>
+        <div class="pgfoot"></div>
+      </div>
+    </section>
+
+  </div>
+
+
+  <div id="view-method" hidden>
+    <section id="method">
+      <div class="w">
+        <div class="k" data-r>METHOD &amp; PITCH · SMART CAMPUS ANALYTICS</div>
+        <h2 data-r>How the score is built, <em>and why it matters.</em></h2>
+        <p class="sub" data-r>The two deliverables the challenge asks for besides the prototype: a short note on the Student Success Score, and the pitch in six slides. Everything below is computed from the active dataset.</p>
+        <div class="cta" data-r style="margin-top:0"><button class="btn sm" type="button" id="mtPrint">Print or save as PDF</button><a class="btn sm" href="#admin" data-role="admin" data-go="admin">Open the campus dashboard</a><a class="btn sm" href="#success">Open the score explorer</a></div>
+
+        <div class="k" style="margin-top:56px" data-r>PART 1 · SCORING NOTE</div>
+        <div class="kpis" id="mtKpis" data-r></div>
+        <div class="app-grid" style="margin-top:16px">
+          <div class="card" data-r>
+            <div class="m">1. DATA INTEGRATION</div>
+            <p style="margin-top:10px;font-size:15px;color:var(--mut)">Seven source tables, one join key (<code>student_id</code>). Each export is cleaned before it is trusted: duplicates removed, out-of-range marks clipped, attendance capped at recorded sessions, names normalised, orphan rows dropped and logged. A missing record stays missing; it is never turned into a zero.</p>
+            <div id="mtSources" style="margin-top:10px"></div>
+          </div>
+          <div class="card" data-r style="--d:1">
+            <div class="m">2. STUDENT SUCCESS SCORE</div>
+            <p style="margin-top:10px;font-size:15px;color:var(--mut)">Score = Σ indicator (0 to 100) × weight. Weights reflect what the campus can act on: academics first, then presence and engagement.</p>
+            <ul class="bars-mini drv" style="margin-top:10px">
+              <li><span>Academic average</span><span><i style="width:35%"></i></span><b>35%</b><small>mean of all scored assessments, 0 to 100</small></li>
+              <li><span>Attendance</span><span><i style="width:15%"></i></span><b>15%</b><small>attended ÷ recorded sessions, whole year</small></li>
+              <li><span>LMS activity</span><span><i style="width:15%"></i></span><b>15%</b><small>70% assignment completion + 30% login frequency (5/week = 100)</small></li>
+              <li><span>Campus engagement</span><span><i style="width:15%"></i></span><b>15%</b><small>events ×8 + clubs ×12 + hackathons ×15 + certifications ×10, capped at 100</small></li>
+              <li><span>Skills assessments</span><span><i style="width:10%"></i></span><b>10%</b><small>mean of technical and soft-skill scores</small></li>
+              <li><span>Student satisfaction</span><span><i style="width:10%"></i></span><b>10%</b><small>survey rating ÷ 5 × 100; feedback a student submits never changes the score</small></li>
+            </ul>
+            <p class="fine" style="margin-top:10px">Missing indicators are excluded and the remaining weights rescaled to 100%, so a student with no LMS record is scored on the other five, not penalised.</p>
+          </div>
+        </div>
+        <div class="app-grid" style="margin-top:16px">
+          <div class="card" data-r>
+            <div class="m">3. PLACEMENT READINESS, SCORED SEPARATELY</div>
+            <ul class="bars-mini drv" style="margin-top:10px">
+              <li><span>Aptitude</span><span><i style="width:30%"></i></span><b>30%</b><small>latest aptitude test</small></li>
+              <li><span>Coding</span><span><i style="width:30%"></i></span><b>30%</b><small>latest coding assessment</small></li>
+              <li><span>Mock interview</span><span><i style="width:25%"></i></span><b>25%</b><small>panel score</small></li>
+              <li><span>Technical skills + certifications</span><span><i style="width:15%"></i></span><b>15%</b><small>technical ×0.8 + certifications ×5, capped at 100</small></li>
+            </ul>
+            <div class="rw" style="margin-top:10px"><span>Under 50</span><b class="bd">Placement support needed</b></div><div class="rw"><span>50 to 64</span><b class="wa">Build readiness</b></div><div class="rw"><span>65 and above</span><b class="ok">Placement ready</b></div>
+            <p class="fine" style="margin-top:10px">Kept apart from the success score so that a strong academic record cannot hide weak placement readiness, which is exactly the segment the challenge calls out.</p>
+          </div>
+          <div class="card" data-r style="--d:1">
+            <div class="m">4. AT-RISK IDENTIFICATION: RULES + PREDICTION</div>
+            <p style="margin-top:10px;font-size:15px;color:var(--mut)"><b style="color:#fff;font-weight:500">Rules (explainable, today).</b> Declining results (semester average falls 8+ points), low subject average (below 55 over 3+ records), repeated topic difficulty (two low scores on the same topic), missing assessments and low attendance as context. Two academic signals = Priority review; one = Support recommended; context only = Monitor.</p>
+            <p style="margin-top:10px;font-size:15px;color:var(--mut)"><b style="color:#fff;font-weight:500">Prediction (early warning, next semester).</b> A transparent logistic model: logit = −0.35 + 0.075·(62 − academic) + 0.045·(75 − attendance) + 0.02·(60 − LMS) + 0.6·backlogs + 0.12·(−trajectory slope) + 0.25·missing assessments. Probability ≥ 60% = high, ≥ 35% = elevated. A trajectory falling 4+ points per semester raises an early warning on its own. Coefficients are hand-set for the demo; an institution fits them on its own outcome history.</p>
+            <div id="mtRisk" style="margin-top:10px"></div>
+          </div>
+        </div>
+        <div class="app-grid" style="margin-top:16px">
+          <div class="card" data-r>
+            <div class="m">5. SEGMENTS (BONUS)</div>
+            <div id="mtSeg" style="margin-top:6px"></div>
+          </div>
+          <div class="card" data-r style="--d:1">
+            <div class="m">6. LIMITATIONS, STATED ON PURPOSE</div>
+            <ul class="ruleslist" style="margin-top:8px">
+              <li><b>1</b><span>Fictional data. Every figure is generated or imported; nothing here is a real student.</span></li>
+              <li><b>2</b><span>Signals, not labels. Flags are reviewable prompts for a human conversation and never shown to students as judgements.</span></li>
+              <li><b>3</b><span>Observed change ≠ caused change. The intervention tracker reports before/after averages without causal claims.</span></li>
+              <li><b>4</b><span>Subject-level marks and topic tags only. Question-level and sub-skill analysis would need question-level data.</span></li>
+              <li><b>5</b><span>The predictive weights are illustrative. Fitting and validating them is the first task once real outcome data exists.</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="k" style="margin-top:64px" data-r>PART 2 · THE PITCH IN SIX SLIDES</div>
+        <div class="lay" id="mtSlides"></div>
+        <div class="pgfoot"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================= CONNECTIONS (public: reachable even when a saved Supabase URL fails) ================= -->
+  <section id="view-connect" hidden>
+    <div class="w app">
+      <div class="app-head">
+        <div>
+          <span class="badge saved">CONNECTIONS. STORED IN THIS BROWSER ONLY.</span>
+          <h2 style="margin-top: 12px; font-size: clamp(2rem, 4vw, 3.2rem)">Connect Gradex.</h2>
+        </div>
+        <div class="cta" style="margin: 0"><a class="btn sm" href="#login">Log in</a><a class="btn sm" href="#top">Home</a></div>
+      </div>
+      <div class="card" id="adConnect">
+        <div class="app-head" style="align-items: center">
+          <div><div class="m">CONNECTIONS · API KEYS</div><p class="fine" style="margin-top: 6px">Connect a Supabase project for real logins and saved data, and an AI provider so Ask Gradex can explain answers in plain words. Keys are stored in this browser only (localStorage) and never leave it except to call the service you name.</p></div>
+          <div class="filters" style="margin: 0"><span class="pill" id="cnSbState">Supabase: off</span><span class="pill" id="cnAiState">AI: off</span></div>
+        </div>
+        <form class="tiform" id="cnForm" autocomplete="off" style="margin-top: 14px">
+          <label class="full" style="letter-spacing:.2em;color:var(--cy)">SUPABASE (database + auth)</label>
+          <label>Project URL<input class="input lt" id="cnSbUrl" placeholder="https://abcdefgh.supabase.co" spellcheck="false"></label>
+          <label>Publishable / anon key<input class="input lt" id="cnSbKey" type="password" placeholder="sb_publishable_… or eyJ…" spellcheck="false"></label>
+          <label class="full" style="letter-spacing:.2em;color:var(--cy);margin-top:6px">AI EXPLAINER (optional)</label>
+          <label>Provider<select class="select" id="cnAiProv"><option value="">Off (deterministic answers only)</option><option value="openrouter">OpenRouter</option><option value="openai">OpenAI</option><option value="groq">Groq</option><option value="nvidia">NVIDIA NIM</option><option value="anthropic">Anthropic</option><option value="google">Google Gemini</option></select></label>
+          <label>Model<input class="input lt" id="cnAiModel" placeholder="e.g. meta-llama/llama-3.3-70b-instruct:free" spellcheck="false"></label>
+          <label class="full">API key<input class="input lt" id="cnAiKey" type="password" placeholder="Paste the provider's API key" spellcheck="false"></label>
+          <div class="full cta" style="margin: 0"><button class="btn p sm" type="submit">Save &amp; reload</button><button class="btn sm" type="button" id="cnTest">Test Supabase</button><button class="btn sm" type="button" id="cnClear">Disconnect all</button></div>
+          <p class="fine full" id="cnMsg" role="status">Never paste a secret / service-role key here: anyone who can open this page could read it. Use the publishable (anon) key; row-level security protects the data.</p>
+        </form>
+    </div>
+  </section>
+
+  <!-- ================= LOGIN ================= -->
+  <section id="view-login" hidden>
+    <div class="portal-band" aria-hidden="true"></div>
+    <div class="w portal" id="loginPortal">
+      <div class="portal-logo" aria-label="Gradex information management system"><i>G</i><span><b>GRADEX</b><small>CAMPUS ANALYTICS · INFORMATION MANAGEMENT SYSTEM</small></span></div>
+      <p class="m" id="portalNote">Choose how you want to log in.</p>
+      <div class="card" id="authState" hidden style="margin-top: 22px; padding: 18px 22px; text-align: left; max-width: 560px; width: 100%"></div>
+      <div class="portal-grid" id="portalGrid">
+        <div class="card pcard">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
+          <h3>Student / Parent Login</h3>
+          <p>Log in with your email and password to see your marks, attendance, CGPA, timetable, support status and personal study suggestions. Gradex keeps a record of your progress and keeps you up to date.</p>
+          <button class="btn p" type="button" data-portal="student">Login Now</button>
+        </div>
+        <div class="card pcard">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-5 9 5-9 5-9-5z"/><path d="M7 11.5V16c0 1.5 2.3 3 5 3s5-1.5 5-3v-4.5"/><path d="M21 9v5"/></svg></span>
+          <h3>Teacher Login</h3>
+          <p>Log in with your faculty email and password to open your class dashboard, Gradex Teaching Intelligence, learning journeys, class insights, the intervention tracker and student feedback.</p>
+          <button class="btn p" type="button" data-portal="teacher">Login Now</button>
+        </div>
+        <div class="card pcard">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 10h18M8 21h8M12 18v3"/><path d="M7 14h3M14 14h3"/></svg></span>
+          <h3>Admin Login</h3>
+          <p>For campus administrators only. Log in with your admin credentials for institution-wide analytics, success scores, risk flags, segments, interventions and data completeness.</p>
+          <button class="btn p" type="button" data-portal="admin">Login Now</button>
+        </div>
+      </div>
+      <p class="fine" id="authMode" style="margin-top: 22px"></p>
+      <p class="fine" id="portalFine">Demo mode: nothing you type is stored or sent anywhere. Each login opens a fictional dataset for that role. <a href="#connect" style="color:var(--cy)">Connect a database or AI key &rarr;</a></p>
+    </div>
+    <div class="w login" id="loginForm" hidden>
+      <div class="login-copy">
+        <button class="btn sm login-back" type="button" id="loginBack"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg> All login options</button>
+        <span class="rolepick" id="rolePick">Student / Parent</span>
+        <h2 style="margin-top: 18px">Pick up <em>where you left off.</em></h2>
+        <p class="sub" id="loginSub2">Your subjects, semesters and next steps are waiting.</p>
+        <p class="m" id="loginNote">Demo mode. Accounts are not connected yet, so any valid email and a password of 8 or more characters opens the demo for this login type. Nothing you type is stored or sent anywhere.</p>
+        <div id="demoBlock">
+          <div class="m" style="margin-top: 26px; letter-spacing: .14em">OR OPEN THE DEMO ACCOUNT</div>
+          <div class="roles" id="roleList">
+            <button class="role" type="button" data-role="student"><i>ST</i><span><b>Aarav Sharma</b><small>B.Tech CSE Sem 5, Section CSE-A. Own records only.</small></span><span>Open &rarr;</span></button>
+            <button class="role" type="button" data-role="teacher"><i>TE</i><span><b>Prof. Rao</b><small>Faculty, Section CSE-A. Teaching Intelligence and class records.</small></span><span>Open &rarr;</span></button>
+            <button class="role" type="button" data-role="admin"><i>AD</i><span><b>Campus admin</b><small>Institution-wide analytics across all 10 sections, data pipeline and CSV import.</small></span><span>Open &rarr;</span></button>
+          </div>
+          <p class="fine" style="margin-top: 12px">Frontend-only role switch over a fictional dataset. It demonstrates role-based views; it is not production authorization.</p>
+        </div>
+      </div>
+      <div class="card-wrap">
+        <div class="card auth" id="card">
+          <div>
+            <h3 id="loginTitle" style="font-size: 1.8rem; font-weight: 500; letter-spacing: -.03em">Log in</h3>
+            <p class="m" id="loginSub">See your semester report.</p>
+          </div>
+          <div class="tabs" role="tablist" aria-label="Log in or create an account">
+            <button class="tab" role="tab" type="button" id="tabIn" aria-selected="true" aria-controls="authForm">Log in</button>
+            <button class="tab" role="tab" type="button" id="tabUp" aria-selected="false" aria-controls="authForm">Create account</button>
+          </div>
+          <form class="form" id="authForm" novalidate>
+            <div class="field" id="nameField" hidden>
+              <label for="name">Your name</label>
+              <input class="input" id="name" name="name" type="text" autocomplete="name" placeholder="Aarav Sharma">
+              <span class="err" id="nameErr"></span>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input class="input" id="email" name="email" type="email" autocomplete="email" placeholder="you@college.edu" required>
+              <span class="err" id="emailErr"></span>
+            </div>
+            <div class="field">
+              <label for="password">Password</label>
+              <div class="input-row">
+                <input class="input" id="password" name="password" type="password" autocomplete="current-password" placeholder="At least 8 characters" required>
+                <button class="eye" type="button" id="eye" aria-pressed="false" aria-label="Show password">Show</button>
+              </div>
+              <div class="strength" id="strength" data-n="0" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+              <span class="err" id="passErr"></span>
+            </div>
+            <div class="row-between">
+              <label class="check"><input type="checkbox" id="remember" name="remember"> Remember me on this device</label>
+              <button class="link" type="button" id="forgot">Forgot password?</button>
+            </div>
+            <button class="btn go wide" type="submit" id="submitBtn" style="justify-content: center; padding: 6px 22px">Log in</button>
+            <span class="sr" role="status" id="formStatus" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)"></span>
+          </form>
+          <p class="m" style="text-align: center"><a href="#login" id="loginAllLink">All login options</a> · <a href="#top">Home</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DEMO APP ================= -->
+  <section id="view-app" hidden>
+    <div class="w app">
+      <div class="app-head">
+        <div>
+          <span class="badge" id="appBadge">DEMO LOGIN. NOTHING IS SAVED.</span>
+          <h2 style="margin-top: 12px; font-size: clamp(2rem, 4vw, 3.2rem)">Hi, <em id="appName">there</em>.</h2>
+        </div>
+        <div class="cta" style="margin: 0">
+          <div class="chips" id="appTerms" role="group" aria-label="Choose a semester"></div>
+          <button class="btn sm" type="button" id="logout">Log out</button>
+        </div>
+      </div>
+      <div class="qa" data-qa="student" aria-label="Student tools" style="margin-top: -8px"></div>
+      <div class="app-grid">
+        <div class="card">
+          <div class="m" id="appTermTitle">SEMESTER REPORT</div>
+          <div class="tbl-wrap" style="margin-top: 12px">
+            <table>
+              <thead><tr><th>SUBJECT</th><th class="num">SCORE</th><th>GRADE</th><th class="num">CHANGE</th></tr></thead>
+              <tbody id="appRows"></tbody>
+            </table>
+          </div>
+          <p class="fine" style="margin-top: 12px" id="appDataNote">Sample data. Grade bands: A 85+, B 70+, C 55+, D 40+.</p>
+        </div>
+        <div class="card">
+          <div class="m">WHERE YOU STAND</div>
+          <ul class="bars-mini" id="appBars" style="margin-top: 12px"></ul>
+          <div class="m" style="margin-top: 22px">WHAT TO WORK ON NEXT</div>
+          <ol class="next" id="appNext" style="margin-top: 8px"></ol>
+        </div>
+      </div>
+      <div class="grid3" id="stuExtras" style="margin-top: 16px" hidden>
+        <div class="card">
+          <div class="m">YOUR LEARNING SUPPORT</div>
+          <div id="stuStatus" style="margin-top: 12px"></div>
+        </div>
+        <div class="card">
+          <div class="m">RECORDED ATTENDANCE</div>
+          <div id="stuAtt" style="margin-top: 8px"></div>
+        </div>
+        <div class="card">
+          <div class="m">LEARNING GOALS AND SUGGESTIONS</div>
+          <div id="stuGoals" style="margin-top: 8px"></div>
+        </div>
+      </div>
+      <div class="app-grid" id="stuFbWrap" style="margin-top: 16px" hidden>
+        <div class="card">
+          <div class="m">GIVE FEEDBACK</div>
+          <p class="fine" style="margin-top: 6px">Tell your teachers how a subject or the course is going. Feedback never lowers your support status or score.</p>
+          <form class="tiform" id="fbForm" autocomplete="off">
+            <label>About<select class="select" id="fbSubj"><option value="">The whole course</option></select></label>
+            <label>Rating<select class="select" id="fbRate"><option value="5">5 · Excellent</option><option value="4" selected>4 · Good</option><option value="3">3 · Okay</option><option value="2">2 · Needs work</option><option value="1">1 · Poor</option></select></label>
+            <label class="full">Comment<textarea class="input ta" id="fbText" maxlength="300" placeholder="What is working, what would help?"></textarea></label>
+            <div class="full cta" style="margin: 0"><button class="btn p sm" type="submit">Send feedback</button></div>
+            <p class="fine full" id="fbMsg" role="status">Stored in this browser only. Teachers see it on their dashboard without your name.</p>
+          </form>
+        </div>
+        <div class="card">
+          <div class="m">FEEDBACK YOU HAVE GIVEN</div>
+          <div id="fbMine"></div>
+          <div class="m" style="margin-top: 20px">FEEDBACK FROM FACULTY</div>
+          <div id="fbFromFac"></div>
+        </div>
+      </div>
+      <div class="card" id="stuScoreCard" style="margin-top: 16px" hidden>
+        <div class="m">YOUR SUCCESS SCORE, EXPLAINED</div>
+        <div id="stuScore"></div>
+      </div>
+      <div class="card" id="stuJourneyCard" style="margin-top: 16px" hidden>
+        <div class="m">PROGRESS OVER TIME, EVERY RECORDED ASSESSMENT</div>
+        <div class="chips" id="stuJSubj" role="group" aria-label="Subject" style="margin-top: 12px"></div>
+        <svg class="chart" id="stuJChart" viewBox="0 0 640 220" role="img" aria-label="Assessment scores over time"></svg>
+        <p class="fine" id="stuJNote"></p>
+      </div>
+      <div class="app-grid" style="margin-top: 16px">
+        <div class="card">
+          <div class="m">CLASS NOTICES</div>
+          <div id="noticeList"><p class="fine" style="margin-top: 10px">Notices appear here when a teacher posts one.</p></div>
+        </div>
+        <div class="card">
+          <div class="m">CLASS SNAPSHOT</div>
+          <div id="classSnap"><p class="fine" style="margin-top: 10px">When a teacher fills in the class roster, the class picture appears here.</p></div>
+        </div>
+      </div>
+      <div class="card" id="editor" style="margin-top: 16px">
+        <div class="m">YOUR SCORES</div>
+        <p style="margin: 8px 0 0; font-size: 16px" id="edIntro">Replace the sample numbers with your own, 0 to 100.</p>
+        <div class="ed-grid" id="edGrid"></div>
+        <div class="cta" style="margin: 0">
+          <button class="btn p sm" type="button" id="edSave">Save my scores</button>
+          <button class="btn sm" type="button" id="edReset">Back to sample data</button>
+        </div>
+        <p class="fine" id="edStatus" role="status" style="margin-top: 12px"></p>
+      </div>
+    </div>
+  </section>
+  <!-- ================= TEACHER ================= -->
+  <section id="view-teacher" hidden>
+    <div class="w app">
+      <div class="app-head">
+        <div>
+          <span class="badge saved" id="tBadge">TEACHER DASHBOARD. FICTIONAL DEMO DATA.</span>
+          <h2 style="margin-top: 12px; font-size: clamp(2rem, 4vw, 3.2rem)" id="tHead">Section CSE-A.</h2>
+          <p class="tagline" style="margin: 10px 0 0" id="tTag" hidden>Gradex Teaching Intelligence. Understand Every Learner. Improve Every Lesson.</p>
+        </div>
+        <div class="cta" style="margin: 0">
+          <div class="chips" id="tClass" role="group" aria-label="Class"></div>
+          <div class="chips" id="tTabs" role="tablist" aria-label="Teacher tools"></div>
+        </div>
+      </div>
+
+      <div class="qa" data-qa="faculty" aria-label="Faculty tools"></div>
+      <!-- Overview -->
+      <div id="tpOverview">
+        <div class="kpis" id="tKpis"></div>
+        <div class="app-grid" style="margin-top: 16px">
+          <div class="card">
+            <div class="m">STUDENTS WHO MAY BENEFIT FROM A REVIEW</div>
+            <p class="fine" style="margin-top: 6px">Reviewable signals from transparent rules, not permanent labels. Open a journey before acting.</p>
+            <div class="tbl-wrap" style="margin-top: 8px"><table><thead><tr><th>STUDENT</th><th>STATUS</th><th>MAIN SIGNAL</th><th class="num">ATT.</th><th class="num">SUCCESS</th><th></th></tr></thead><tbody id="tReview"></tbody></table></div>
+          </div>
+          <div class="card">
+            <div class="m">CLASS TREND, AVERAGE OF RECORDED ASSESSMENTS</div>
+            <svg class="chart" id="tTrend" viewBox="0 0 640 220" role="img" aria-label="Class average and attendance by term"></svg>
+            <div class="legend"><span><i style="background: var(--cy)"></i>Class average score</span><span><i style="background: rgba(138,168,255,.6)"></i>Attendance %</span></div>
+            <div class="m" style="margin-top: 20px">LEARNING-GAP INDICATORS IN THIS CLASS</div>
+            <div id="tGapCounts"></div>
+          </div>
+        </div>
+        <div class="app-grid" style="margin-top: 16px">
+          <div class="card">
+            <div class="m">STUDENT FEEDBACK, THIS CLASS</div>
+            <div id="tFbSummary"></div>
+            <div class="m" style="margin-top: 16px">RECENT COMMENTS (ANONYMOUS)</div>
+            <div id="tFbList"></div>
+          </div>
+          <div class="card">
+            <div class="m">FACULTY FEEDBACK FOR A STUDENT</div>
+            <form class="tiform" id="tfbForm" autocomplete="off">
+              <label>Student<select class="select" id="tfbStudent"></select></label>
+              <label>Subject<select class="select" id="tfbSubj"><option value="">General</option></select></label>
+              <label>Rating<select class="select" id="tfbRate"><option value="5">5 · Excellent progress</option><option value="4" selected>4 · Good</option><option value="3">3 · Steady</option><option value="2">2 · Needs support</option><option value="1">1 · Concern</option></select></label>
+              <label class="full">Note to the student<textarea class="input ta" id="tfbText" maxlength="300" placeholder="Specific, supportive, actionable."></textarea></label>
+              <div class="full cta" style="margin: 0"><button class="btn p sm" type="submit">Send to student</button></div>
+              <p class="fine full" id="tfbMsg" role="status">Appears on the student's dashboard and profile. Stored in this browser only.</p>
+            </form>
+          </div>
+        </div>
+        <div class="app-grid" style="margin-top: 16px">
+          <div class="card">
+            <div class="m">CLASS-WIDE INSIGHTS</div>
+            <div id="tInsightsMini"></div>
+            <div class="cta" style="margin: 14px 0 0"><button class="btn sm" type="button" data-ti="insights">Open class insights</button></div>
+          </div>
+          <div class="card">
+            <div class="m">PENDING INTERVENTIONS AND FOLLOW-UPS</div>
+            <div id="tPending"></div>
+            <div class="cta" style="margin: 14px 0 0"><button class="btn sm" type="button" data-ti="tracker">Open the tracker</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Class records (shared database) -->
+      <div id="tpRecords" hidden>
+      <div class="chips" id="tRecTabs" role="tablist" aria-label="Class records" style="margin-bottom: 16px"></div>
+      <div class="card" id="tLock">
+        <div class="m">WHO CAN USE THIS</div>
+        <p style="margin: 10px 0 0; font-size: 17px" id="tLockText">The shared class-records database (roster, marks entry, notices) is only available when this page is published as a Claude artifact and shared with you as an editor. In this local demo it is simulated as unavailable; everything else on the teacher dashboard runs on the fictional dataset.</p>
+      </div>
+      <div id="tMain" hidden>
+        <div class="app-grid" id="tpStudents">
+          <div class="card">
+            <div class="m">STUDENTS</div>
+            <div id="tList" style="margin-top: 6px"></div>
+            <div class="pl-in" style="grid-template-columns: minmax(0, 1fr) auto; align-items: end">
+              <label>New student name<input class="input lt" id="tNew" maxlength="40" autocomplete="off"></label>
+              <button class="btn sm" type="button" id="tAdd">Add</button>
+            </div>
+            <p class="fine" style="margin-top: 10px">Everyone who can open this page can read the roster, so use sample names unless the page is private to your class.</p>
+          </div>
+          <div class="card" id="tEd" hidden>
+            <div class="m">EDITING <span id="tEdName" style="color: var(--cy)"></span></div>
+            <div class="chips" id="tTerm" role="group" aria-label="Semester" style="margin-top: 12px"></div>
+            <div class="ed-grid" id="tScores" style="margin-bottom: 0"></div>
+            <div class="pl-in">
+              <label>Classes attended<input class="input" id="tAtA" type="number" min="0" max="999" step="1" inputmode="numeric"></label>
+              <label>Total classes<input class="input" id="tAtT" type="number" min="0" max="999" step="1" inputmode="numeric"></label>
+            </div>
+            <label class="t-field">Remark for the student<input class="input lt" id="tRem" maxlength="140" autocomplete="off"></label>
+            <div class="bts"><button class="btn p sm" type="button" id="tSave">Save student</button><button class="btn sm" type="button" id="tDel">Remove student</button></div>
+            <p class="fine" id="tStatus" role="status" style="margin-top: 12px"></p>
+          </div>
+        </div>
+        <div class="app-grid" id="tpNotices" hidden>
+          <div class="card">
+            <div class="m">POST A NOTICE</div>
+            <label class="t-field">Title<input class="input lt" id="tNTitle" maxlength="80" autocomplete="off"></label>
+            <label class="t-field">Notice<textarea class="input ta" id="tNText" maxlength="600"></textarea></label>
+            <div class="bts"><button class="btn p sm" type="button" id="tNPost">Post to students</button></div>
+            <p class="fine" id="tNStatus" role="status" style="margin-top: 12px">Students see notices on their dashboard after they log in.</p>
+          </div>
+          <div class="card">
+            <div class="m">PUBLISHED NOTICES</div>
+            <div id="tNList"><p class="fine" style="margin-top: 10px">Nothing posted yet.</p></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TEACHING INTELLIGENCE (own page) ================= -->
+  <section id="view-ti" hidden>
+    <div class="w app">
+      <div class="app-head">
+        <div>
+          <span class="badge saved" id="tiBadge">GRADEX TEACHING INTELLIGENCE. FICTIONAL DEMO DATA.</span>
+          <h2 style="margin-top: 12px; font-size: clamp(2rem, 4vw, 3.2rem)">Teaching Intelligence.</h2>
+          <p class="tagline" style="margin: 10px 0 0">Understand Every Learner. Improve Every Lesson.</p>
+        </div>
+        <div class="cta" style="margin: 0">
+          <div class="chips" id="tiClass" role="group" aria-label="Class"></div>
+          <a class="btn sm" href="#teacher">Teacher dashboard</a>
+        </div>
+      </div>
+      <div class="qa" data-qa="faculty" aria-label="Faculty tools"></div>
+      <div id="tpTI">
+        <div class="card">
+          <div class="filters">
+            <span class="m">STUDENT</span>
+            <select class="select" id="tiStudent" aria-label="Student"></select>
+            <span class="m">SUBJECT</span>
+            <div class="chips" id="tiSubj" role="group" aria-label="Subject"></div>
+            <span class="m">PERIOD</span>
+            <div class="chips" id="tiTerm" role="group" aria-label="Period"></div>
+          </div>
+          <div class="subtabs" id="tiTabs" role="tablist" aria-label="Teaching Intelligence sections"></div>
+        </div>
+
+        <div id="ti-journey" class="app-grid" style="margin-top: 16px">
+          <div class="card">
+            <div class="m" id="tiJTitle">LEARNING JOURNEY</div>
+            <svg class="chart" id="tiJChart" viewBox="0 0 640 230" role="img" aria-label="Assessment scores over time"></svg>
+            <p class="fine" id="tiJAvail"></p>
+            <div class="m" style="margin-top: 18px">SUBJECT STRENGTHS AND DIFFICULTIES</div>
+            <ul class="bars-mini" id="tiJBars" style="margin-top: 10px"></ul>
+          </div>
+          <div class="card">
+            <div class="m">TIMELINE OF RECORDS</div>
+            <ol class="tl" id="tiJTl"></ol>
+          </div>
+        </div>
+
+        <div id="ti-gaps" hidden style="margin-top: 16px">
+          <div class="grid3" id="tiGaps"></div>
+          <div class="card" style="margin-top: 16px">
+            <div class="m">HOW GAPS AND SUPPORT STATUS ARE IDENTIFIED</div>
+            <ul class="ruleslist" id="tiRules" style="margin-top: 10px"></ul>
+          </div>
+        </div>
+
+        <div id="ti-advisor" hidden style="margin-top: 16px">
+          <div class="grid3" id="tiAdv"></div>
+        </div>
+
+        <div id="ti-insights" hidden style="margin-top: 16px">
+          <div class="app-grid">
+            <div class="card">
+              <div class="m" id="tiCIHead">CLASS-WIDE PATTERNS</div>
+              <div class="tbl-wrap" style="margin-top: 8px"><table><thead><tr><th>SUBJECT / TOPIC</th><th class="num">CLASS AVG</th><th class="num">BELOW 55</th><th class="num">RECORDS</th><th>READ</th></tr></thead><tbody id="tiCIRows"></tbody></table></div>
+              <p class="fine" style="margin-top: 10px">Aggregated across the class. Individual students are not ranked here. Topic rows use the topic tag recorded on quizzes and tests; exams are mixed-topic and feed only the subject rows.</p>
+            </div>
+            <div class="card">
+              <div class="m">SUGGESTED LESSON ADJUSTMENTS</div>
+              <div id="tiCISug"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="ti-tracker" hidden style="margin-top: 16px">
+          <div class="app-grid">
+            <div class="card">
+              <div class="m">RECORD A TEACHING ADJUSTMENT</div>
+              <form class="tiform" id="ivForm" autocomplete="off">
+                <label>Target<select class="select" id="ivTarget"></select></label>
+                <label>Subject<select class="select" id="ivSubj"></select></label>
+                <label>Topic<input class="input" id="ivTopic" maxlength="40" placeholder="Optional"></label>
+                <label>Strategy<select class="select" id="ivStrat"></select></label>
+                <label class="full">Identified learning gap<input class="input" id="ivGap" maxlength="160" required></label>
+                <label class="full">Supporting evidence<textarea class="input ta" id="ivEv" maxlength="400"></textarea></label>
+                <label>Date of adjustment<input class="input" id="ivDate" type="date" required></label>
+                <label>Follow-up assessment<input class="input" id="ivFollow" type="date" required></label>
+                <label>Status<select class="select" id="ivStatus"><option value="planned">Planned</option><option value="in_progress">In progress</option><option value="completed">Completed</option><option value="more_support">Further support needed</option></select></label>
+                <label class="full">Teacher notes<textarea class="input ta" id="ivNotes" maxlength="400"></textarea></label>
+                <div class="full cta" style="margin: 0"><button class="btn p sm" type="submit" id="ivSave">Save intervention</button><button class="btn sm" type="button" id="ivClear">Clear</button></div>
+                <p class="fine full" id="ivStatusMsg" role="status">Saved in this browser only.</p>
+              </form>
+            </div>
+            <div class="card">
+              <div class="m">INTERVENTION HISTORY</div>
+              <div id="ivList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= STUDENT PROFILE (teacher / admin) ================= -->
+  <section id="view-profile" hidden>
+    <div class="w app">
+      <div class="app-head">
+        <div>
+          <span class="badge saved">STUDENT PROFILE. FICTIONAL DEMO DATA.</span>
+          <h2 style="margin-top: 12px; font-size: clamp(2rem, 4vw, 3.2rem)" id="pfName"></h2>
+          <p class="m" id="pfMeta" style="margin-top: 6px"></p>
+        </div>
+        <div class="cta" style="margin: 0">
+          <a class="btn sm p" id="pfOpenTI" href="#ti">Open in Teaching Intelligence</a>
+          <a class="btn sm" id="pfBack" href="#teacher">Back</a>
+        </div>
+      </div>
+      <div class="kpis" id="pfKpis"></div>
+      <div class="app-grid" style="margin-top: 16px">
+        <div class="card">
+          <div class="m">RISK FLAGS AND SEGMENT</div>
+          <div id="pfFlags" style="margin-top: 6px"></div>
+          <div class="m" style="margin-top: 20px">UNIFIED STUDENT VIEW, ALL SOURCES</div>
+          <div class="uni" id="pfUnified"></div>
+        </div>
+        <div class="card" id="pfDrivers"></div>
+      </div>
+      <div class="app-grid" style="margin-top: 16px">
+        <div class="card">
+          <div class="m">SUBJECT AVERAGES BY SEMESTER</div>
+          <div class="tbl-wrap" style="margin-top: 8px"><table><thead><tr><th>SUBJECT</th><th class="num">SEM 3</th><th class="num">SEM 4</th><th class="num">SEM 5</th><th class="num">ATT.</th></tr></thead><tbody id="pfRows"></tbody></table></div>
+          <p class="fine" style="margin-top: 10px">A dash means no scored assessment was recorded for that semester. Attendance = attended sessions ÷ recorded sessions for the whole year.</p>
+        </div>
+        <div class="card">
+          <div class="m">SUPPORT STATUS AND EVIDENCE</div>
+          <div id="pfStatus" style="margin-top: 12px"></div>
+          <div class="m" style="margin-top: 20px">LEARNING HISTORY</div>
+          <ol class="tl" id="pfTl"></ol>
+        </div>
+      </div>
+      <div class="app-grid" style="margin-top: 16px">
+        <div class="card">
+          <div class="m">INTERVENTIONS FOR THIS STUDENT</div>
+          <div id="pfIv"></div>
+        </div>
+        <div class="card">
+          <div class="m">FEEDBACK</div>
+          <div id="pfFb"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ADMIN ================= -->
+  <section id="view-admin" hidden>
+    <div class="w app">
+      <div class="app-head">
+        <div>
+          <span class="badge saved">ADMINISTRATOR DASHBOARD. FICTIONAL DEMO DATA.</span>
+          <h2 style="margin-top: 12px; font-size: clamp(2rem, 4vw, 3.2rem)">Campus analytics.</h2>
+        </div>
+        <div class="cta" style="margin: 0">
+          <div class="chips" id="adClass" role="group" aria-label="Class"></div>
+          <div class="chips" id="adTerm" role="group" aria-label="Semester"></div>
+        </div>
+      </div>
+      <div class="qa" data-qa="admin" aria-label="Administrator tools"></div>
+      <div class="kpis" id="adKpis" style="margin-top: 16px"></div>
+      <div class="card" style="margin-top: 16px" id="adPipeline">
+        <div class="app-head" style="align-items: center">
+          <div><div class="m">DATA INTEGRATION PIPELINE</div><p class="fine" style="margin-top: 6px">Seven source exports joined on <code>student_id</code>, cleaned, logged, then every score on this page is recomputed. Drop your own CSVs to replace the demo.</p></div>
+          <div class="filters" style="margin: 0">
+            <label class="btn sm p" for="adImport" style="cursor:pointer">Import CSVs</label>
+            <input id="adImport" type="file" accept=".csv,text/csv" multiple hidden>
+            <button class="btn sm" type="button" id="adSamples">Download the 7 sample CSVs</button>
+            <button class="btn sm" type="button" id="adResetData">Reset to demo data</button>
+          </div>
+        </div>
+        <div class="g" id="adSources" style="margin-top: 14px"></div>
+        <div class="app-grid" style="margin-top: 14px">
+          <div><div class="m">CLEANING LOG, THIS INTEGRATION</div><ul class="ruleslist" id="adQuality" style="margin-top: 8px"></ul></div>
+          <div><div class="m">STAGED FOR IMPORT</div><div id="adStaged" class="m" style="margin-top: 8px">Nothing staged. Expected files: students, academic, attendance, lms, engagement, placement, skills, feedback (any subset; students + academic are required). Headers are matched by name, so column order does not matter.</div><div class="cta" style="margin: 12px 0 0"><button class="btn sm p" type="button" id="adIntegrate" hidden>Integrate staged files</button></div></div>
+        </div>
+      </div>
+      <div class="app-grid" style="margin-top: 16px">
+        <div class="card">
+          <div class="m">STUDENT SUCCESS SCORE DISTRIBUTION</div>
+          <div class="dist" id="adSsDist" aria-hidden="true"></div>
+          <div class="dist-l" id="adSsL"></div>
+          <div class="m" style="margin-top: 20px">WHAT DRIVES THE SCORE, ON AVERAGE</div>
+          <div id="adDrivers"></div>
+          <p class="fine" style="margin-top: 10px">Success score = academic average 35% + attendance 15% + LMS activity 15% + campus engagement 15% + skills assessments 10% + student satisfaction 10%. Placement readiness is scored separately (aptitude 30%, coding 30%, mock interview 25%, technical skills and certifications 15%) so academic success and placement outcomes are never blended. Missing indicators are excluded and the rest rescaled.</p>
+        </div>
+        <div class="card">
+          <div class="m">RISK FLAGS</div>
+          <div id="adRisk"></div>
+          <div class="m" style="margin-top: 20px">STUDENT SEGMENTS</div>
+          <div id="adSeg"></div>
+          <div class="m" style="margin-top: 20px">FEEDBACK</div>
+          <div id="adFb"></div>
+        </div>
+      </div>
+      <div class="app-grid" style="margin-top: 16px">
+        <div class="card">
+          <div class="m">STUDENT-SUPPORT CLASSIFICATIONS</div>
+          <div class="dist" id="adDist" aria-hidden="true"></div>
+          <div class="dist-l" id="adDistL"></div>
+          <p class="fine" style="margin-top: 12px">Demo support indicators from transparent rules (see the rules card). They are reviewable signals, not validated predictions.</p>
+          <div class="m" style="margin-top: 20px">ACADEMIC AND ATTENDANCE TREND</div>
+          <svg class="chart" id="adTrend" viewBox="0 0 640 220" role="img" aria-label="Average score and attendance by term"></svg>
+          <div class="legend"><span><i style="background: var(--cy)"></i>Average score</span><span><i style="background: rgba(138,168,255,.6)"></i>Attendance %</span></div>
+        </div>
+        <div class="card">
+          <div class="m">CLASS COMPARISON</div>
+          <div class="tbl-wrap" style="margin-top: 8px"><table><thead><tr><th>CLASS</th><th>COURSE</th><th class="num">STUDENTS</th><th class="num">AVG</th><th class="num">ATT.</th><th class="num">SUCCESS</th><th class="num">ACAD. RISK</th><th class="num">PLC. RISK</th><th class="num">FOLLOW-UP</th></tr></thead><tbody id="adClasses"></tbody></table></div>
+          <div class="m" style="margin-top: 20px">INTERVENTIONS</div>
+          <div id="adIv"></div>
+          <div class="m" style="margin-top: 20px">DATA COMPLETENESS</div>
+          <div id="adComplete"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top: 16px">
+        <div class="app-head" style="align-items: center">
+          <div class="m">STUDENT DIRECTORY</div>
+          <div class="filters" style="margin: 0">
+            <input class="search" id="adSearch" type="search" placeholder="Search by name" aria-label="Search students">
+            <select class="select" id="adStatus" aria-label="Status filter"><option value="">All flags</option><option value="priority">Academic: Priority review</option><option value="support">Academic: Support recommended</option><option value="monitor">Academic: Monitor</option><option value="on_track">Academic: On track</option><option value="insufficient">More information needed</option><option value="rk_high">Predicted: high risk</option><option value="rk_warn">Predicted: declining trajectory</option><option value="pl_support">Placement: support needed</option><option value="pl_monitor">Placement: build readiness</option><option value="ready">Placement: ready</option></select>
+            <button class="btn sm" type="button" id="adExport">Export CSV</button>
+          </div>
+        </div>
+        <div class="tbl-wrap" style="margin-top: 8px">
+          <table id="adTable">
+            <thead><tr><th class="sort" data-k="name">STUDENT</th><th class="sort" data-k="cls">CLASS</th><th class="sort num" data-k="avg">AVG</th><th class="sort num" data-k="att">ATT.</th><th class="sort num" data-k="missing">MISSING</th><th class="sort num" data-k="ss">SUCCESS</th><th class="sort num" data-k="rp">RISK P.</th><th class="sort" data-k="level">ACADEMIC</th><th class="sort num" data-k="pl">PLACEMENT</th><th class="sort" data-k="plf">PLC. FLAG</th><th class="sort" data-k="seg">SEGMENT</th><th class="sort num" data-k="iv">INTERV.</th></tr></thead>
+            <tbody id="adRows"></tbody>
+          </table>
+        </div>
+        <p class="fine" id="adCount" style="margin-top: 10px"></p>
+      </div>
+      <div class="app-grid" style="margin-top: 16px">
+        <div class="card">
+          <div class="m">SUPPORT RULES AND THRESHOLDS</div>
+          <ul class="ruleslist" id="adRules" style="margin-top: 10px"></ul>
+        </div>
+        <div class="card">
+          <div class="m">DATA SOURCE</div>
+          <div id="adSource"></div>
+          <p class="fine" style="margin-top: 12px">Every number on this page is recalculated from the same records that drive the student, teacher and Ask Gradex views.</p>
+          <div class="cta" style="margin: 14px 0 0"><a class="btn sm" href="#connect">Connections &amp; API keys</a></div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </section>
+</main>
+<nav class="qn" id="qn" aria-label="Quick navigation" hidden>
+  <button type="button" id="qnBack" title="Back to the previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span>Back</span></button>
+  <button type="button" class="home" id="qnHome" title="Go to the home page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span>Home</span></button>
+</nav>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<footer>
+  <span>Gradex. Scores, subjects and grade bands on this page are sample data.</span>
+  <a href="#explore">All pages</a>
+  <a href="#login">Log in</a>
+  <a href="#end">Waitlist</a>
+  <a href="#teacher" id="ftTeach" hidden>Teacher</a>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="script.js"></script>
+
+</body></html>
