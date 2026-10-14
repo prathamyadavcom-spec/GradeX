@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/sb/:path*", "destination": "https://dlabuggatsuhbwuixpvd.supabase.co/:path*" }
+  ]
+}

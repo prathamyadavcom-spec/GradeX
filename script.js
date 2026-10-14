@@ -3,7 +3,7 @@
 (function () {
   'use strict';
   /* Edit these to match the real product. */
-  var CONFIG = { waitlistUrl: '', ai: { provider: 'openrouter', model: 'meta-llama/llama-3.3-70b-instruct:free', fallbackModel: 'google/gemma-3-27b-it:free', key: '', edgeFunction: 'ask-gradex' }, supabase: { url: 'https://vafrmajuvvhykemtalui.supabase.co', anonKey: 'sb_publishable_T0C1umAx-STjXmxO_fU0uQ_aWX1znuT', profilesTable: 'profiles', idColumn: 'id', roleColumn: 'role', allowDemo: true } }; /* Fill url + anonKey (the public anon key only, never the service-role key) to switch from demo accounts to real Supabase auth. See SUPABASE.md. */ /* Optional AI explainer. Leave key empty in browser code; route through a backend if you add one. */
+  var CONFIG = { waitlistUrl: '', ai: { provider: 'openrouter', model: 'meta-llama/llama-3.3-70b-instruct:free', fallbackModel: 'google/gemma-3-27b-it:free', key: '', edgeFunction: 'ask-gradex' }, supabase: { url: 'https://dlabuggatsuhbwuixpvd.supabase.co', anonKey: 'sb_publishable_KtOvfY7Uu_kFkOw8vqeTxw_D8eI229W', profilesTable: 'profiles', idColumn: 'id', roleColumn: 'role', allowDemo: true } }; /* Fill url + anonKey (the public anon key only, never the service-role key) to switch from demo accounts to real Supabase auth. See SUPABASE.md. */ /* Optional AI explainer. Leave key empty in browser code; route through a backend if you add one. */
   var CN_KEY = 'gradex.connections', CN = {};
   try { CN = JSON.parse(localStorage.getItem(CN_KEY) || '{}') || {}; } catch (e) { CN = {}; }
   if (CN.sbUrl && CN.sbKey && /^https:\/\/[a-z0-9-]+\.supabase\.(co|in)/.test(CN.sbUrl)) { CONFIG.supabase.url = CN.sbUrl; CONFIG.supabase.anonKey = CN.sbKey; }
@@ -2004,6 +2004,20 @@
      ===================================================================== */
   var AUTH = { status: 'idle', user: null, role: null, msg: '', sub: null, seq: 0 }, sbClient = null, ALLOWED_ROLES = ['student', 'teacher', 'admin'];
   function sbOn() { return !!(CONFIG.supabase && CONFIG.supabase.url && CONFIG.supabase.anonKey); }
+  /* Some Indian ISPs (Jio, Airtel, ACT) block *.supabase.co by DNS, which shows up as "Failed to fetch".
+     The site's own host forwards /sb/* to the Supabase project (vercel.json rewrite / Netlify _redirects),
+     so the browser only ever talks to our domain. Falls back to the direct URL when no proxy is set up (e.g. localhost). */
+  var SB_DIRECT = null;
+  function sbPickUrl() {
+    if (SB_DIRECT !== null) return Promise.resolve(CONFIG.supabase.url);
+    SB_DIRECT = CONFIG.supabase.url;
+    if (CN.sbUrl || !/^https?:$/.test(location.protocol) || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return Promise.resolve(SB_DIRECT);
+    var proxy = location.origin + '/sb', ctl = window.AbortController ? new AbortController() : null, timer = setTimeout(function () { if (ctl) ctl.abort(); }, 4000);
+    return fetch(proxy + '/auth/v1/health', { headers: { apikey: CONFIG.supabase.anonKey }, signal: ctl ? ctl.signal : undefined, cache: 'no-store' })
+      .then(function (r) { if (r.ok && /json/.test(r.headers.get('content-type') || '')) CONFIG.supabase.url = proxy; })
+      .catch(function () {})
+      .then(function () { clearTimeout(timer); return CONFIG.supabase.url; });
+  }
   function sbLoad() {
     return new Promise(function (res, rej) {
       if (window.supabase && window.supabase.createClient) return res(window.supabase);
@@ -2093,9 +2107,9 @@
   function sbSubmit(em, pw, signUp, name) {
     if (!sbClient) { $('#formStatus').textContent = 'Authentication is still loading.'; return; }
     var btn = $('#submitBtn'); btn.disabled = true; $('#formStatus').textContent = signUp ? 'Creating your account' : 'Signing in';
-    var p = signUp ? sbClient.auth.signUp({ email: em, password: pw, options: { data: { full_name: name } } }) : sbClient.auth.signInWithPassword({ email: em, password: pw });
+    var p = signUp ? sbClient.auth.signUp({ email: em, password: pw, options: { data: { full_name: name }, emailRedirectTo: location.origin + location.pathname + '#login' } }) : sbClient.auth.signInWithPassword({ email: em, password: pw });
     p.then(function (r) {
-      if (r.error) { setErr(pass, $('#passErr'), r.error.message && /invalid|credentials/i.test(r.error.message) ? 'Email or password is incorrect.' : (r.error.message || 'Sign-in failed.')); $('#formStatus').textContent = 'Sign-in failed.'; return; }
+      if (r.error) { var em2 = String(r.error.message || ''); setErr(pass, $('#passErr'), /invalid|credentials/i.test(em2) ? 'Email or password is incorrect.' : (/failed to fetch|network|load failed/i.test(em2) ? 'Could not reach the sign-in server. Check your internet connection and try again.' : (/already registered/i.test(em2) ? 'An account with this email already exists. Switch to Log in.' : (em2 || 'Sign-in failed.')))); $('#formStatus').textContent = 'Sign-in failed.'; return; }
       pass.value = ''; $('#strength').dataset.n = 0;
       if (signUp && r.data && !r.data.session) { $('#formStatus').textContent = 'Check your email to confirm the account, then log in. In the meantime, open a demo account above.'; setErr(email, $('#emailErr'), ''); toast('Account created. Confirm your email, then log in.'); return; }
       /* onAuthStateChange(SIGNED_IN) triggers sbResolve; call directly too in case the event already fired */
@@ -2106,7 +2120,8 @@
     if (!sbOn()) { authRender(); return; }
     try { sessionStorage.removeItem('gradex.role'); } catch (e) {}
     authSet('loading'); route();
-    sbLoad().then(function (lib) {
+    Promise.all([sbLoad(), sbPickUrl()]).then(function (res) {
+      var lib = res[0];
       sbClient = lib.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
       if (AUTH.sub) { try { AUTH.sub.unsubscribe(); } catch (e) {} AUTH.sub = null; }
       var res = sbClient.auth.onAuthStateChange(function (ev, sess) {
